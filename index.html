@@ -186,7 +186,8 @@
     const x = 70 + random() * (world.width - 140);
     const y = 55 + random() * (world.height - 110);
     const nearPath = Math.abs(y - (750 + Math.sin(x / 190) * 90)) < 100 || Math.abs(x - (700 + Math.sin(y / 180) * 110)) < 90 || Math.abs(x - 1700) < 105 && Math.abs(y - 750) < 150;
-    if (!nearPath && Math.hypot(x - player.x, y - player.y) > 140) {
+    const nearLight = lights.some(light => Math.hypot(x - light.x, y - light.y) < 76);
+    if (!nearPath && !nearLight && Math.hypot(x - player.x, y - player.y) > 140) {
       trees.push({ x, y, r: 24 + random() * 27, hue: random(), sway: random() * TAU });
     }
   }
