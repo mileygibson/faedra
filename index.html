@@ -176,18 +176,22 @@
     { x: 1512, y: 385, name: 'the hollow light', taken: false }
   ];
   const shrine = { x: 1844, y: 738, radius: 62 };
+  const riverCrossing = { y: 740, halfHeight: 34 };
   const signposts = [
     { x: 355, y: 706, text: 'A weatherworn sign reads: “When the fireflies fade, follow the old roots east.”' },
     { x: 924, y: 603, text: 'The stream murmurs under the moss. Something bright glimmers downstream.' },
     { x: 1430, y: 755, text: 'Three empty hollows wait in the heartwood. The forest is holding its breath.' }
   ];
   const trees = [];
+  const lightTrail = { dx: lights[0].x - player.x, dy: lights[0].y - player.y };
   for (let i = 0; i < 180; i++) {
     const x = 70 + random() * (world.width - 140);
     const y = 55 + random() * (world.height - 110);
     const nearPath = Math.abs(y - (750 + Math.sin(x / 190) * 90)) < 100 || Math.abs(x - (700 + Math.sin(y / 180) * 110)) < 90 || Math.abs(x - 1700) < 105 && Math.abs(y - 750) < 150;
     const nearLight = lights.some(light => Math.hypot(x - light.x, y - light.y) < 76);
-    if (!nearPath && !nearLight && Math.hypot(x - player.x, y - player.y) > 140) {
+    const trailPosition = Math.max(0, Math.min(1, ((x - player.x) * lightTrail.dx + (y - player.y) * lightTrail.dy) / (lightTrail.dx ** 2 + lightTrail.dy ** 2)));
+    const nearLightTrail = Math.hypot(x - player.x - lightTrail.dx * trailPosition, y - player.y - lightTrail.dy * trailPosition) < 48;
+    if (!nearPath && !nearLight && !nearLightTrail && Math.hypot(x - player.x, y - player.y) > 140) {
       trees.push({ x, y, r: 24 + random() * 27, hue: random(), sway: random() * TAU });
     }
   }
@@ -223,6 +227,10 @@
       ctx.fillStyle = i % 3 === 0 ? 'rgba(202, 205, 132, .12)' : 'rgba(27, 57, 34, .12)';
       ctx.fillRect(x, y, 2 + i % 3, 1 + i % 2);
     }
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(player.x, player.y); ctx.lineTo(lights[0].x, lights[0].y);
+      ctx.strokeStyle = 'rgba(166, 154, 108, .9)'; ctx.lineWidth = 31; ctx.stroke();
+      ctx.strokeStyle = 'rgba(226, 205, 145, .2)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(-60, 810);
     ctx.bezierCurveTo(330, 570, 512, 858, 870, 708);
@@ -251,6 +259,7 @@
     ctx.strokeStyle = 'rgba(226, 205, 145, .2)';
     ctx.stroke();
     drawStream();
+    drawBridge();
     drawClearing();
   }
   function drawStream() {
@@ -275,6 +284,32 @@
       ctx.strokeStyle = 'rgba(200, 230, 194, .24)';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 10 + i % 8, y + 3); ctx.stroke();
+    }
+  }
+  function drawBridge() {
+    const centerX = 1028 + Math.sin(riverCrossing.y / 130) * 37 + Math.sin(riverCrossing.y / 75) * 14;
+    ctx.fillStyle = 'rgba(29, 43, 31, .3)';
+    ctx.fillRect(centerX - 61, riverCrossing.y - 20, 122, 42);
+    ctx.fillStyle = '#59452f';
+    ctx.fillRect(centerX - 60, riverCrossing.y - 20, 120, 40);
+    for (let i = 0; i < 10; i++) {
+      ctx.fillStyle = i % 2 === 0 ? '#98764b' : '#a58455';
+      ctx.fillRect(centerX - 56 + i * 12, riverCrossing.y - 17, 10, 34);
+      ctx.strokeStyle = 'rgba(61, 48, 34, .5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(centerX - 56 + i * 12, riverCrossing.y - 17, 10, 34);
+    }
+    ctx.strokeStyle = '#c0a16c';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(centerX - 59, riverCrossing.y - 20);
+    ctx.lineTo(centerX + 59, riverCrossing.y - 20);
+    ctx.moveTo(centerX - 59, riverCrossing.y + 20);
+    ctx.lineTo(centerX + 59, riverCrossing.y + 20);
+    ctx.stroke();
+    ctx.fillStyle = '#d2bd8c';
+    for (const x of [centerX - 52, centerX + 52]) {
+      ctx.beginPath(); ctx.arc(x, riverCrossing.y - 20, 2, 0, TAU); ctx.arc(x, riverCrossing.y + 20, 2, 0, TAU); ctx.fill();
     }
   }
   function drawClearing() {
@@ -377,32 +412,85 @@
     const step = moving ? Math.sin(elapsed * 13) * 3 : 0;
     const hop = player.jump;
     const x = player.x, y = player.y - hop;
+    const horizontalFacing = Math.abs(player.faceX) > Math.abs(player.faceY);
+    const facing = horizontalFacing ? player.faceX > 0 ? 'right' : 'left' : player.faceY > 0 ? 'down' : 'up';
     ctx.fillStyle = 'rgba(20, 34, 24, .35)';
-    ctx.beginPath(); ctx.ellipse(x, player.y + 7, 15 - hop * .018, 6 - hop * .009, 0, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x, player.y + 7, 14 - hop * .018, 6 - hop * .009, 0, 0, TAU); ctx.fill();
     if (player.attack > 0) {
       const angle = Math.atan2(player.faceY, player.faceX);
       ctx.strokeStyle = `rgba(236, 239, 190, ${Math.min(1, player.attack * 5)})`;
-      ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y - 1, 31, angle - .82, angle + .82); ctx.stroke();
-      ctx.strokeStyle = 'rgba(255, 244, 191, .45)'; ctx.lineWidth = 10;
-      ctx.beginPath(); ctx.arc(x, y - 1, 32, angle - .72, angle + .72); ctx.stroke();
+      ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y - 8, 29, angle - .82, angle + .82); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 244, 191, .4)'; ctx.lineWidth = 9;
+      ctx.beginPath(); ctx.arc(x, y - 8, 30, angle - .72, angle + .72); ctx.stroke();
     }
     if (player.invulnerable > 0 && Math.floor(elapsed * 15) % 2 === 0) ctx.globalAlpha = .5;
-    ctx.fillStyle = '#334533';
-    ctx.beginPath(); ctx.ellipse(x, y + 7, 11, 12, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#d3b77f';
-    ctx.beginPath(); ctx.ellipse(x, y - 1, 9, 11, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#bd765e';
-    ctx.beginPath(); ctx.ellipse(x + player.faceX * 5, y + 7 + step, 4, 3, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#e1c88d';
-    ctx.beginPath(); ctx.arc(x, y - 12, 8, Math.PI, 0); ctx.lineTo(x + 8, y - 8); ctx.quadraticCurveTo(x, y - 12, x - 8, y - 8); ctx.fill();
-    ctx.fillStyle = '#536b4b';
-    ctx.beginPath(); ctx.moveTo(x - 8, y - 12); ctx.quadraticCurveTo(x - 2, y - 24, x + 7, y - 13); ctx.quadraticCurveTo(x + 10, y - 4, x + 6, y + 1); ctx.quadraticCurveTo(x + 3, y - 8, x - 8, y - 12); ctx.fill();
-    ctx.fillStyle = '#3a4938';
-    ctx.beginPath(); ctx.arc(x + player.faceX * 5, y - 2, 1.2, 0, TAU); ctx.fill();
-    if (player.attack > 0) {
-      ctx.strokeStyle = '#ded29e'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(x + player.faceX * 9, y + 2); ctx.lineTo(x + player.faceX * 19, y - 3); ctx.stroke();
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.lineCap = 'round';
+    ctx.fillStyle = '#553d32';
+    ctx.beginPath(); ctx.ellipse(0, -2, 8, 10, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#594632'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-4, 3); ctx.lineTo(-5 + step, 11); ctx.moveTo(4, 3); ctx.lineTo(5 - step, 11); ctx.stroke();
+    ctx.strokeStyle = '#49382d'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(-5 + step, 11); ctx.lineTo(-7 + step, 13); ctx.moveTo(5 - step, 11); ctx.lineTo(7 - step, 13); ctx.stroke();
+    ctx.fillStyle = '#344b39';
+    ctx.beginPath();
+    if (facing === 'left' || facing === 'right') {
+      ctx.moveTo(-6, -10); ctx.quadraticCurveTo(0, -13, 6, -10); ctx.lineTo(7, -1); ctx.lineTo(5, 7); ctx.lineTo(-5, 7); ctx.lineTo(-7, -1);
+    } else {
+      ctx.moveTo(-7, -10); ctx.quadraticCurveTo(0, -14, 7, -10); ctx.lineTo(9, -2); ctx.lineTo(6, 7); ctx.lineTo(-6, 7); ctx.lineTo(-9, -2);
     }
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#61794e';
+    ctx.beginPath(); ctx.moveTo(-6, -10); ctx.quadraticCurveTo(0, -12, 6, -10); ctx.lineTo(7, 1); ctx.lineTo(0, 5); ctx.lineTo(-7, 1); ctx.closePath(); ctx.fill();
+    if (facing === 'up') {
+      ctx.strokeStyle = '#89936a'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, -8); ctx.lineTo(0, 3); ctx.stroke();
+    } else if (facing === 'down') {
+      ctx.fillStyle = '#d5bd85';
+      ctx.beginPath(); ctx.arc(0, -5, 1.2, 0, TAU); ctx.arc(0, -1, 1.2, 0, TAU); ctx.fill();
+    } else {
+      ctx.fillStyle = facing === 'left' ? '#293d30' : '#89936a';
+      ctx.fillRect(facing === 'left' ? -5 : 3, -6, 2, 10);
+    }
+    ctx.fillStyle = '#76865a';
+    ctx.beginPath(); ctx.ellipse(-8, -7, 4, 5, -.3, 0, TAU); ctx.ellipse(8, -7, 4, 5, .3, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#d7b487'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(-10, -6); ctx.lineTo(-13, -1); ctx.moveTo(10, -6); ctx.lineTo(13, -1); ctx.stroke();
+    ctx.fillStyle = '#d5bd85';
+    ctx.fillRect(-7, 2, 14, 2);
+    ctx.fillStyle = '#745637';
+    ctx.fillRect(-2, 1, 4, 4);
+    ctx.fillStyle = '#d7b487';
+    ctx.beginPath(); ctx.ellipse(0, -14, 6, 6, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#553d32';
+    ctx.beginPath(); ctx.ellipse(0, -17, 7.5, 7, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#76513a';
+    ctx.beginPath(); ctx.ellipse(-1, -19, 4, 3, -.35, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#d5bd85';
+    ctx.beginPath(); ctx.arc(4, -20, 1.5, 0, TAU); ctx.fill();
+    if (facing === 'down') {
+      ctx.fillStyle = '#d7b487';
+      ctx.beginPath(); ctx.ellipse(0, -10, 4.5, 2.7, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#342a24';
+      ctx.beginPath(); ctx.arc(-2, -11, .8, 0, TAU); ctx.arc(2, -11, .8, 0, TAU); ctx.fill();
+    } else if (facing === 'left' || facing === 'right') {
+      const side = facing === 'left' ? -1 : 1;
+      ctx.fillStyle = '#d7b487';
+      ctx.beginPath(); ctx.ellipse(side * 4, -14, 2.8, 4, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#342a24';
+      ctx.beginPath(); ctx.arc(side * 5, -15, .8, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#e6c594';
+      ctx.beginPath(); ctx.arc(side * 7, -13, 1.2, 0, TAU); ctx.fill();
+    } else {
+      ctx.fillStyle = '#76513a';
+      ctx.beginPath(); ctx.ellipse(0, -10, 5, 3, 0, 0, TAU); ctx.fill();
+    }
+    ctx.strokeStyle = '#745637'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(9, -6); ctx.lineTo(13, -13); ctx.stroke();
+    ctx.strokeStyle = '#e5e2ce'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(13, -13); ctx.lineTo(17, -23); ctx.stroke();
+    ctx.restore();
     ctx.globalAlpha = 1;
   }
   function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -411,7 +499,7 @@
     for (const tree of trees) if (Math.hypot(x - tree.x, y - (tree.y - tree.r * .1)) < tree.r * .48 + 11) return true;
     if (x > 971 && x < 1095 && y > 0 && y < world.height) {
       const riverX = 1028 + Math.sin(y / 130) * 37 + Math.sin(y / 75) * 14;
-      if (Math.abs(x - riverX) < 38) return true;
+      if (Math.abs(x - riverX) < 38 && Math.abs(y - riverCrossing.y) > riverCrossing.halfHeight) return true;
     }
     return false;
   }
