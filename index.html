@@ -194,6 +194,10 @@
     { x: 924, y: 603, text: 'The stream murmurs under the moss. Something bright glimmers downstream.' },
     { x: 1430, y: 755, text: 'Three empty hollows wait in the heartwood. The forest is holding its breath.' }
   ];
+  const forestFolk = [
+    { x: 1672, y: 744, name: 'Elowen', robe: '#7d8c59', hair: '#493b32', spoken: false, text: 'You brought the three lights home. Listen, Faedra. Hartshollow is breathing again.' },
+    { x: 2010, y: 744, name: 'Rowan', robe: '#a16e49', hair: '#39392f', spoken: false, text: 'The old paths will remember your footsteps now. There is more to discover beyond the stream.' }
+  ];
   const trees = [];
   const lightTrail = { startX: player.x, startY: player.y, dx: lights[0].x - player.x, dy: lights[0].y - player.y };
   for (let i = 0; i < 180; i++) {
@@ -201,9 +205,10 @@
     const y = 55 + random() * (world.height - 110);
     const nearPath = Math.abs(y - (750 + Math.sin(x / 190) * 90)) < 100 || Math.abs(x - (700 + Math.sin(y / 180) * 110)) < 90 || Math.abs(x - 1700) < 105 && Math.abs(y - 750) < 150;
     const nearLight = lights.some(light => Math.hypot(x - light.x, y - light.y) < 76);
+    const nearForestFolk = forestFolk.some(person => Math.hypot(x - person.x, y - person.y) < 62);
     const trailPosition = Math.max(0, Math.min(1, ((x - lightTrail.startX) * lightTrail.dx + (y - lightTrail.startY) * lightTrail.dy) / (lightTrail.dx ** 2 + lightTrail.dy ** 2)));
     const nearLightTrail = Math.hypot(x - lightTrail.startX - lightTrail.dx * trailPosition, y - lightTrail.startY - lightTrail.dy * trailPosition) < 48;
-    if (!nearPath && !nearLight && !nearLightTrail && Math.hypot(x - player.x, y - player.y) > 140) {
+    if (!nearPath && !nearLight && !nearForestFolk && !nearLightTrail && Math.hypot(x - player.x, y - player.y) > 140) {
       trees.push({ x, y, r: 24 + random() * 27, hue: random(), sway: random() * TAU });
     }
   }
@@ -508,6 +513,24 @@
     ctx.strokeStyle = '#e0c782'; ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = '#6f5939'; ctx.fillRect(sign.x - 5, sign.y - 12, 10, 2);
   }
+  function drawForestPerson(person) {
+    const x = person.x, y = person.y;
+    ctx.fillStyle = 'rgba(20, 34, 24, .34)';
+    ctx.beginPath(); ctx.ellipse(x, y + 8, 13, 6, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#49382d';
+    ctx.beginPath(); ctx.ellipse(x - 4, y + 5, 3, 5, 0, 0, TAU); ctx.ellipse(x + 4, y + 5, 3, 5, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = person.robe;
+    ctx.beginPath(); ctx.moveTo(x - 8, y - 7); ctx.lineTo(x + 8, y - 7); ctx.lineTo(x + 11, y + 4); ctx.lineTo(x + 6, y + 9); ctx.lineTo(x - 6, y + 9); ctx.lineTo(x - 11, y + 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(225, 207, 151, .65)';
+    ctx.fillRect(x - 7, y + 1, 14, 2);
+    ctx.fillStyle = '#d7b487';
+    ctx.beginPath(); ctx.ellipse(x, y - 12, 6, 6, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = person.hair;
+    ctx.beginPath(); ctx.ellipse(x, y - 15, 7, 5, 0, Math.PI, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(25, 34, 27, .8)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText(person.name, x, y - 24);
+  }
   function drawLight(light) {
     if (light.taken) return;
     const pulse = .78 + Math.sin(elapsed * 3.2 + light.x) * .16;
@@ -665,6 +688,12 @@
       const d = distance(player, sign);
       if (d < nearestDistance && d < 62) { nearest = { type: 'sign', item: sign }; nearestDistance = d; }
     }
+    if (shrineAwakened) {
+      for (const person of forestFolk) {
+        const d = distance(player, person);
+        if (d < nearestDistance && d < 56) { nearest = { type: 'person', item: person }; nearestDistance = d; }
+      }
+    }
     const shrineDistance = distance(player, shrine);
     if (shrineDistance < nearestDistance && shrineDistance < 96) nearest = { type: 'shrine', item: shrine };
     return nearest;
@@ -677,7 +706,7 @@
   function updateHud() {
     seedLabel.textContent = `${player.collected} / 3 ✦`;
     areaLabel.textContent = scene === 'shrine' ? 'The Heartwood Shrine' : 'Forest of Hartshollow';
-    questLabel.textContent = scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    questLabel.textContent = scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -733,6 +762,12 @@
       return;
     }
     if (target.type === 'sign') { say(target.item.text); return; }
+    if (target.type === 'person') {
+      target.item.spoken = true;
+      say(target.item.text);
+      updateHud();
+      return;
+    }
     if (player.collected < 3) { say('The heartwood is quiet. Find all three lost lights first.'); return; }
     forestReturn = { x: player.x, y: player.y };
     scene = 'shrine';
@@ -816,7 +851,7 @@
         inscription: 'E  Read the inscription',
         exit: 'E  Return to the forest'
       };
-      hint.textContent = hints[target.type];
+      hint.textContent = target.type === 'person' ? `E  Talk to ${target.item.name}` : hints[target.type];
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
@@ -839,6 +874,7 @@
       for (const sign of signposts) drawSign(sign);
       for (const light of lights) drawLight(light);
       const actors = trees.map(tree => ({ y: tree.y, draw: () => drawTree(tree) }));
+      if (shrineAwakened) for (const person of forestFolk) actors.push({ y: person.y, draw: () => drawForestPerson(person) });
       actors.push({ y: player.y, draw: drawPlayer });
       for (const enemy of enemies) if (enemy.alive) actors.push({ y: enemy.y, draw: () => drawEnemy(enemy) });
       actors.sort((a, b) => a.y - b.y);
