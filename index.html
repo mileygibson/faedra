@@ -310,27 +310,50 @@
     }
   }
   function drawClearing() {
-    ctx.beginPath(); ctx.ellipse(shrine.x, shrine.y, 152, 108, 0, 0, TAU);
-    ctx.fillStyle = 'rgba(183, 166, 112, .75)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(229, 208, 149, .55)'; ctx.lineWidth = 4; ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(shrine.x, shrine.y, 120, 83, 0, 0, TAU);
-    ctx.strokeStyle = 'rgba(96, 116, 66, .72)'; ctx.lineWidth = 3; ctx.stroke();
-    for (let i = 0; i < 7; i++) {
-      const angle = i * TAU / 7 - Math.PI / 2;
-      const x = shrine.x + Math.cos(angle) * 99;
-      const y = shrine.y + Math.sin(angle) * 68;
-      ctx.fillStyle = '#6e7952';
-      ctx.beginPath(); ctx.ellipse(x, y, 10, 7, angle, 0, TAU); ctx.fill();
-      ctx.fillStyle = 'rgba(215, 220, 157, .45)';
-      ctx.beginPath(); ctx.ellipse(x - 2, y - 2, 4, 2, angle, 0, TAU); ctx.fill();
-    }
-    ctx.fillStyle = '#634c35';
-    ctx.beginPath(); ctx.ellipse(shrine.x, shrine.y + 21, 33, 17, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#876e46';
-    ctx.beginPath(); ctx.ellipse(shrine.x, shrine.y + 16, 29, 13, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#d1be81'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(shrine.x, shrine.y + 11); ctx.lineTo(shrine.x, shrine.y - 20); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(shrine.x - 12, shrine.y - 1); ctx.quadraticCurveTo(shrine.x, shrine.y - 13, shrine.x + 12, shrine.y - 1); ctx.stroke();
+    const x = shrine.x, y = shrine.y;
+    ctx.beginPath();
+    ctx.moveTo(x - 143, y - 18);
+    ctx.quadraticCurveTo(x - 112, y - 111, x - 27, y - 99);
+    ctx.quadraticCurveTo(x + 62, y - 122, x + 136, y - 48);
+    ctx.quadraticCurveTo(x + 151, y + 23, x + 79, y + 92);
+    ctx.quadraticCurveTo(x - 32, y + 116, x - 119, y + 58);
+    ctx.quadraticCurveTo(x - 158, y + 27, x - 143, y - 18);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(157, 145, 103, .62)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(91, 100, 65, .42)'; ctx.lineWidth = 2; ctx.stroke();
+
+    ctx.fillStyle = 'rgba(37, 48, 34, .28)';
+    ctx.beginPath(); ctx.ellipse(x - 52, y - 39, 19, 13, -.15, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 55, y - 53, 14, 11, .2, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#74765d';
+    ctx.beginPath(); ctx.moveTo(x - 66, y - 61); ctx.lineTo(x - 42, y - 66); ctx.lineTo(x - 35, y - 23); ctx.lineTo(x - 58, y - 17); ctx.lineTo(x - 70, y - 31); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(190, 190, 145, .36)';
+    ctx.beginPath(); ctx.moveTo(x - 63, y - 57); ctx.lineTo(x - 44, y - 61); ctx.lineTo(x - 42, y - 53); ctx.lineTo(x - 61, y - 50); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#777961';
+    ctx.beginPath(); ctx.moveTo(x + 47, y - 72); ctx.lineTo(x + 68, y - 68); ctx.lineTo(x + 70, y - 36); ctx.lineTo(x + 54, y - 30); ctx.lineTo(x + 43, y - 43); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(194, 193, 148, .32)';
+    ctx.beginPath(); ctx.moveTo(x + 50, y - 68); ctx.lineTo(x + 65, y - 65); ctx.lineTo(x + 64, y - 58); ctx.lineTo(x + 49, y - 60); ctx.closePath(); ctx.fill();
+
+    ctx.fillStyle = '#6d7058';
+    ctx.beginPath(); ctx.moveTo(x - 99, y + 19); ctx.lineTo(x - 78, y + 13); ctx.lineTo(x - 66, y + 25); ctx.lineTo(x - 72, y + 39); ctx.lineTo(x - 96, y + 36); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 79, y + 28); ctx.lineTo(x + 104, y + 19); ctx.lineTo(x + 117, y + 31); ctx.lineTo(x + 108, y + 46); ctx.lineTo(x + 83, y + 43); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#7f8064';
+    ctx.beginPath(); ctx.moveTo(x + 25, y + 67); ctx.lineTo(x + 60, y + 49); ctx.lineTo(x + 76, y + 57); ctx.lineTo(x + 71, y + 70); ctx.lineTo(x + 40, y + 82); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(198, 194, 151, .35)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x + 34, y + 67); ctx.lineTo(x + 57, y + 58); ctx.stroke();
+
+    ctx.fillStyle = 'rgba(36, 44, 32, .36)';
+    ctx.beginPath(); ctx.ellipse(x + 4, y + 15, 38, 24, -.12, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#696c55';
+    ctx.beginPath(); ctx.moveTo(x - 32, y - 13); ctx.lineTo(x + 21, y - 21); ctx.lineTo(x + 34, y - 12); ctx.lineTo(x + 29, y + 16); ctx.lineTo(x + 10, y + 21); ctx.lineTo(x - 31, y + 12); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#85836a';
+    ctx.beginPath(); ctx.moveTo(x - 28, y - 11); ctx.lineTo(x + 19, y - 17); ctx.lineTo(x + 29, y - 10); ctx.lineTo(x + 25, y + 9); ctx.lineTo(x + 8, y + 15); ctx.lineTo(x - 27, y + 7); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(67, 69, 53, .78)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - 3, y - 15); ctx.lineTo(x - 8, y - 5); ctx.lineTo(x + 1, y + 1); ctx.lineTo(x - 5, y + 12); ctx.moveTo(x + 19, y - 11); ctx.lineTo(x + 12, y - 3); ctx.stroke();
+    ctx.strokeStyle = 'rgba(205, 194, 143, .66)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - 17, y - 2); ctx.lineTo(x - 8, y - 6); ctx.moveTo(x + 2, y + 9); ctx.lineTo(x + 8, y + 5); ctx.stroke();
+    ctx.fillStyle = 'rgba(125, 146, 84, .72)';
+    ctx.beginPath(); ctx.ellipse(x - 24, y + 1, 8, 3, -.35, 0, TAU); ctx.ellipse(x + 28, y - 8, 7, 3, .4, 0, TAU); ctx.fill();
   }
   function drawStone(s) {
     ctx.fillStyle = 'rgba(28, 48, 30, .22)';
