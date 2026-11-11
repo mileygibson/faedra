@@ -227,10 +227,6 @@
       ctx.fillStyle = i % 3 === 0 ? 'rgba(202, 205, 132, .12)' : 'rgba(27, 57, 34, .12)';
       ctx.fillRect(x, y, 2 + i % 3, 1 + i % 2);
     }
-      ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(lightTrail.startX, lightTrail.startY); ctx.lineTo(lights[0].x, lights[0].y);
-      ctx.strokeStyle = 'rgba(166, 154, 108, .9)'; ctx.lineWidth = 31; ctx.stroke();
-      ctx.strokeStyle = 'rgba(226, 205, 145, .2)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(-60, 810);
     ctx.bezierCurveTo(330, 570, 512, 858, 870, 708);
