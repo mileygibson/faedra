@@ -176,21 +176,21 @@
     { x: 1512, y: 385, name: 'the hollow light', taken: false }
   ];
   const shrine = { x: 1844, y: 738, radius: 62 };
-  const riverCrossing = { y: 740, halfHeight: 34 };
+    const riverCrossing = { y: 740, halfHeight: 42 };
   const signposts = [
     { x: 355, y: 706, text: 'A weatherworn sign reads: “When the fireflies fade, follow the old roots east.”' },
     { x: 924, y: 603, text: 'The stream murmurs under the moss. Something bright glimmers downstream.' },
     { x: 1430, y: 755, text: 'Three empty hollows wait in the heartwood. The forest is holding its breath.' }
   ];
   const trees = [];
-  const lightTrail = { dx: lights[0].x - player.x, dy: lights[0].y - player.y };
+  const lightTrail = { startX: player.x, startY: player.y, dx: lights[0].x - player.x, dy: lights[0].y - player.y };
   for (let i = 0; i < 180; i++) {
     const x = 70 + random() * (world.width - 140);
     const y = 55 + random() * (world.height - 110);
     const nearPath = Math.abs(y - (750 + Math.sin(x / 190) * 90)) < 100 || Math.abs(x - (700 + Math.sin(y / 180) * 110)) < 90 || Math.abs(x - 1700) < 105 && Math.abs(y - 750) < 150;
     const nearLight = lights.some(light => Math.hypot(x - light.x, y - light.y) < 76);
-    const trailPosition = Math.max(0, Math.min(1, ((x - player.x) * lightTrail.dx + (y - player.y) * lightTrail.dy) / (lightTrail.dx ** 2 + lightTrail.dy ** 2)));
-    const nearLightTrail = Math.hypot(x - player.x - lightTrail.dx * trailPosition, y - player.y - lightTrail.dy * trailPosition) < 48;
+    const trailPosition = Math.max(0, Math.min(1, ((x - lightTrail.startX) * lightTrail.dx + (y - lightTrail.startY) * lightTrail.dy) / (lightTrail.dx ** 2 + lightTrail.dy ** 2)));
+    const nearLightTrail = Math.hypot(x - lightTrail.startX - lightTrail.dx * trailPosition, y - lightTrail.startY - lightTrail.dy * trailPosition) < 48;
     if (!nearPath && !nearLight && !nearLightTrail && Math.hypot(x - player.x, y - player.y) > 140) {
       trees.push({ x, y, r: 24 + random() * 27, hue: random(), sway: random() * TAU });
     }
@@ -228,7 +228,7 @@
       ctx.fillRect(x, y, 2 + i % 3, 1 + i % 2);
     }
       ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(player.x, player.y); ctx.lineTo(lights[0].x, lights[0].y);
+      ctx.beginPath(); ctx.moveTo(lightTrail.startX, lightTrail.startY); ctx.lineTo(lights[0].x, lights[0].y);
       ctx.strokeStyle = 'rgba(166, 154, 108, .9)'; ctx.lineWidth = 31; ctx.stroke();
       ctx.strokeStyle = 'rgba(226, 205, 145, .2)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.beginPath();
@@ -288,28 +288,29 @@
   }
   function drawBridge() {
     const centerX = 1028 + Math.sin(riverCrossing.y / 130) * 37 + Math.sin(riverCrossing.y / 75) * 14;
+    const halfWidth = 90;
     ctx.fillStyle = 'rgba(29, 43, 31, .3)';
-    ctx.fillRect(centerX - 61, riverCrossing.y - 20, 122, 42);
+    ctx.fillRect(centerX - halfWidth - 2, riverCrossing.y - 23, halfWidth * 2 + 4, 48);
     ctx.fillStyle = '#59452f';
-    ctx.fillRect(centerX - 60, riverCrossing.y - 20, 120, 40);
-    for (let i = 0; i < 10; i++) {
+    ctx.fillRect(centerX - halfWidth, riverCrossing.y - 22, halfWidth * 2, 44);
+    for (let i = 0; i < 15; i++) {
       ctx.fillStyle = i % 2 === 0 ? '#98764b' : '#a58455';
-      ctx.fillRect(centerX - 56 + i * 12, riverCrossing.y - 17, 10, 34);
+      ctx.fillRect(centerX - 87 + i * 12, riverCrossing.y - 19, 10, 38);
       ctx.strokeStyle = 'rgba(61, 48, 34, .5)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(centerX - 56 + i * 12, riverCrossing.y - 17, 10, 34);
+      ctx.strokeRect(centerX - 87 + i * 12, riverCrossing.y - 19, 10, 38);
     }
     ctx.strokeStyle = '#c0a16c';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(centerX - 59, riverCrossing.y - 20);
-    ctx.lineTo(centerX + 59, riverCrossing.y - 20);
-    ctx.moveTo(centerX - 59, riverCrossing.y + 20);
-    ctx.lineTo(centerX + 59, riverCrossing.y + 20);
+    ctx.moveTo(centerX - halfWidth, riverCrossing.y - 22);
+    ctx.lineTo(centerX + halfWidth, riverCrossing.y - 22);
+    ctx.moveTo(centerX - halfWidth, riverCrossing.y + 22);
+    ctx.lineTo(centerX + halfWidth, riverCrossing.y + 22);
     ctx.stroke();
     ctx.fillStyle = '#d2bd8c';
-    for (const x of [centerX - 52, centerX + 52]) {
-      ctx.beginPath(); ctx.arc(x, riverCrossing.y - 20, 2, 0, TAU); ctx.arc(x, riverCrossing.y + 20, 2, 0, TAU); ctx.fill();
+    for (const x of [centerX - 82, centerX + 82]) {
+      ctx.beginPath(); ctx.arc(x, riverCrossing.y - 22, 2, 0, TAU); ctx.arc(x, riverCrossing.y + 22, 2, 0, TAU); ctx.fill();
     }
   }
   function drawClearing() {
@@ -499,7 +500,7 @@
     for (const tree of trees) if (Math.hypot(x - tree.x, y - (tree.y - tree.r * .1)) < tree.r * .48 + 11) return true;
     if (x > 971 && x < 1095 && y > 0 && y < world.height) {
       const riverX = 1028 + Math.sin(y / 130) * 37 + Math.sin(y / 75) * 14;
-      if (Math.abs(x - riverX) < 38 && Math.abs(y - riverCrossing.y) > riverCrossing.halfHeight) return true;
+      if (Math.abs(x - riverX) < 55 && Math.abs(y - riverCrossing.y) > riverCrossing.halfHeight) return true;
     }
     return false;
   }
