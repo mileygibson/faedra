@@ -1798,6 +1798,10 @@
         updateHud();
         say('You step into the old stone circle.');
       } else if (target.type === 'lakeEntrance') {
+        if (!meadowBlooms.every(bloom => bloom.taken)) {
+          say('The stream path is quiet. Gather all three meadow blooms before heading to the lake.');
+          return;
+        }
         lakeReturn = { x: player.x, y: player.y };
         scene = 'lake';
         player.x = 160;
@@ -1908,6 +1912,10 @@
       return;
     }
     if (target.type === 'meadowGate') {
+      if (player.collected < 3) {
+        say('The meadow gate is quiet. Find all three lost lights to open the path.');
+        return;
+      }
       meadowReturn = { x: player.x, y: player.y };
       scene = 'meadow';
       player.x = 155;
@@ -2034,11 +2042,11 @@
       const hints = {
         sign: 'E  Read the sign',
         shrine: player.collected === 3 ? 'E  Enter the ancient shrine' : 'The old shrine is waiting for three lights',
-        meadowGate: 'E  Follow the eastern lane to the meadow',
+        meadowGate: player.collected < 3 ? 'Find all three lost lights to open the meadow gate' : 'E  Follow the eastern lane to the meadow',
         meadowExit: 'E  Return to the village',
         meadowPerson: `E  Talk to ${meadowGuide.name}`,
         meadowGatheringPlace: 'E  Explore the stone circle',
-        lakeEntrance: 'E  Follow the stream to the South Lake',
+        lakeEntrance: meadowBlooms.every(bloom => bloom.taken) ? 'E  Follow the stream to the South Lake' : 'Gather all three blooms to open the lake path',
         lakeBoat: 'E  Board the boat',
         lakeDock: 'E  Dock at the shore',
         moonstoneEntrance: 'E  Enter Moonstone Isle',
