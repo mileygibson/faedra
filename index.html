@@ -195,6 +195,10 @@
   ];
   const meadowGatheringPlace = { x: 2820, y: 740 };
   const meadowExit = { x: 75, y: 740 };
+  const meadowGuide = {
+    x: 320, y: 740, name: 'Lark', robe: '#8b9861', hair: '#b57b55', spoken: false,
+    text: 'I’m Lark, keeper of the summer paths. Follow the flower trail east to the old stone circle. Its heartstone is waiting for three meadow blooms.'
+  };
   const stoneCircleExit = { x: 450, y: 730 };
   const stoneCircleAltar = { x: 450, y: 420 };
   const stoneCircleInscriptions = [
@@ -1225,6 +1229,7 @@
     if (scene === 'meadow') {
       const targets = [
         { type: 'meadowExit', item: meadowExit, range: 60 },
+        { type: 'meadowPerson', item: meadowGuide, range: 56 },
         { type: 'meadowGatheringPlace', item: meadowGatheringPlace, range: 78 }
       ];
       let nearest = null, nearestDistance = Infinity;
@@ -1362,6 +1367,9 @@
         meadowReturn = null;
         updateHud();
         say('You return to the village lane.');
+      } else if (target.type === 'meadowPerson') {
+        target.item.spoken = true;
+        say(target.item.text);
       } else if (target.type === 'meadowGatheringPlace') {
         meadowCircleReturn = { x: player.x, y: player.y };
         scene = 'stoneCircle';
@@ -1544,6 +1552,7 @@
         shrine: player.collected === 3 ? 'E  Enter the ancient shrine' : 'The old shrine is waiting for three lights',
         meadowGate: 'E  Follow the eastern lane to the meadow',
         meadowExit: 'E  Return to the village',
+        meadowPerson: `E  Talk to ${meadowGuide.name}`,
         meadowGatheringPlace: 'E  Explore the stone circle',
         circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
         circleInscription: 'E  Read the stone carving',
@@ -1577,6 +1586,7 @@
       drawMeadowGround();
       for (const bloom of meadowBlooms) drawMeadowBloom(bloom);
       const actors = meadowEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      actors.push({ y: meadowGuide.y, draw: () => drawForestPerson(meadowGuide) });
       actors.push({ y: player.y, draw: drawPlayer });
       actors.sort((a, b) => a.y - b.y);
       for (const actor of actors) actor.draw();
