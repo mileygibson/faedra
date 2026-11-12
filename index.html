@@ -257,6 +257,10 @@
     x: 2550, y: 740, name: 'Neris', robe: '#64828a', hair: '#d1b27b', spoken: false,
     text: 'The blooms have awakened the heartstone. Head south through the meadow to the lake. Its stream runs west and joins the river you crossed in the forest; perhaps the current has a story of its own.'
   };
+  const moonstoneGuide = {
+    x: 2470, y: 1000, name: 'Aster', robe: '#627d86', hair: '#d2bd86', spoken: false,
+    text: 'The forest’s northern gate opens to the Northstar Glade. Four aurora shards lie scattered there; carry them to the Northstar altar to awaken its light.'
+  };
   const shrine = { x: 1844, y: 738, radius: 62 };
   const shrineAltar = { x: 350, y: 250 };
   const shrineDoor = { x: 350, y: 700 };
@@ -1794,7 +1798,8 @@
       const targets = inBoat ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 85 })) : [
         { type: 'lakeExit', item: lakeExit, range: 62 },
         { type: 'lakeBoat', item: lakeBoat, range: 76 },
-        { type: 'moonstoneEntrance', item: moonstoneEntrance, range: 62 }
+        { type: 'moonstoneEntrance', item: moonstoneEntrance, range: 62 },
+        ...(lakeItemsDelivered ? [{ type: 'moonstoneGuide', item: moonstoneGuide, range: 64 }] : [])
       ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
@@ -2035,6 +2040,9 @@
         player.jumpTime = 0;
         updateHud();
         say('You pass through the old arch into Moonstone Isle.');
+      } else if (target.type === 'moonstoneGuide') {
+        target.item.spoken = true;
+        say(target.item.text);
       } else if (target.type === 'lakeExit') {
         inBoat = false;
         scene = 'meadow';
@@ -2279,6 +2287,7 @@
         circleInscription: 'E  Read the stone carving',
         circleExit: 'E  Return to the meadow',
         lakeGuide: `E  Talk to ${lakeGuide.name}`,
+        moonstoneGuide: `E  Talk to ${moonstoneGuide.name}`,
         lakeExit: 'E  Follow the stream back to the meadow',
         altar: shrineAwakened ? 'E  Listen to the heartwood' : 'E  Set the lights into the altar',
         inscription: 'E  Read the inscription',
@@ -2309,6 +2318,7 @@
       const boatY = inBoat ? player.y : lakeBoat.y;
       const boatAngle = inBoat ? Math.atan2(player.faceY, player.faceX) : 0;
       drawLakeBoat(boatX, boatY, boatAngle);
+      if (lakeItemsDelivered) drawForestPerson(moonstoneGuide);
       drawPlayer();
     } else if (scene === 'moonstoneIsle') {
       drawMoonstoneInterior();
