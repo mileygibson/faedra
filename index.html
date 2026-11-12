@@ -143,7 +143,7 @@
   const world = { width: 3300, height: 1500 };
   const shrineWorld = { width: 700, height: 800 };
   const buildingWorld = { width: 700, height: 600 };
-  const meadowWorld = { width: 1400, height: 900 };
+  const meadowWorld = { width: world.width, height: world.height };
   const keys = new Set();
   const touch = { x: 0, y: 0, actions: new Set() };
   let width = innerWidth;
@@ -187,12 +187,12 @@
     { x: 1512, y: 385, name: 'the hollow light', taken: false }
   ];
   const meadowBlooms = [
-    { x: 370, y: 265, name: 'a sunbell', taken: false, color: '#f5d875' },
-    { x: 665, y: 650, name: 'a blue starflower', taken: false, color: '#9dc8dc' },
-    { x: 930, y: 275, name: 'a roseheart bloom', taken: false, color: '#e8a4a0' }
+    { x: 560, y: 385, name: 'a sunbell', taken: false, color: '#f5d875' },
+    { x: 1450, y: 1120, name: 'a blue starflower', taken: false, color: '#9dc8dc' },
+    { x: 2280, y: 360, name: 'a roseheart bloom', taken: false, color: '#e8a4a0' }
   ];
-  const meadowGatheringPlace = { x: 1160, y: 455 };
-  const meadowExit = { x: 75, y: 455 };
+  const meadowGatheringPlace = { x: 2820, y: 740 };
+  const meadowExit = { x: 75, y: 740 };
   const shrine = { x: 1844, y: 738, radius: 62 };
   const shrineAltar = { x: 350, y: 250 };
   const shrineDoor = { x: 350, y: 700 };
@@ -508,14 +508,85 @@
     ctx.font = '8px "DM Mono", monospace'; ctx.textAlign = 'center';
     ctx.fillText('VILLAGE', 2313, 716);
 
+    drawMeadowGate();
+  }
+  function drawMeadowGate() {
+    const x = 3233, y = 740;
+    ctx.fillStyle = 'rgba(24, 37, 25, .36)';
+    ctx.beginPath(); ctx.ellipse(x, y + 15, 82, 27, 0, 0, TAU); ctx.fill();
+
+    for (const postX of [x - 57, x + 57]) {
+      ctx.fillStyle = '#554a37';
+      ctx.fillRect(postX - 13, y - 79, 26, 160);
+      ctx.fillStyle = '#918264';
+      ctx.fillRect(postX - 9, y - 75, 18, 152);
+      ctx.fillStyle = '#b4a078';
+      ctx.fillRect(postX - 17, y - 83, 34, 12);
+      ctx.fillRect(postX - 18, y + 70, 36, 13);
+      ctx.fillStyle = 'rgba(61, 58, 42, .55)';
+      ctx.fillRect(postX - 5, y - 59, 2, 112);
+      for (let mark = 0; mark < 3; mark++) {
+        ctx.fillStyle = 'rgba(226, 218, 172, .65)';
+        ctx.beginPath();
+        ctx.ellipse(postX + (mark % 2 ? 4 : -3), y - 40 + mark * 31, 2, 7, mark * .5, 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    ctx.strokeStyle = '#57402d';
+    ctx.lineWidth = 18;
+    ctx.beginPath();
+    ctx.moveTo(x - 49, y - 73);
+    ctx.quadraticCurveTo(x, y - 154, x + 49, y - 73);
+    ctx.stroke();
+    ctx.strokeStyle = '#a27a4d';
+    ctx.lineWidth = 9;
+    ctx.beginPath();
+    ctx.moveTo(x - 46, y - 76);
+    ctx.quadraticCurveTo(x, y - 145, x + 46, y - 76);
+    ctx.stroke();
+
+    ctx.fillStyle = '#49382a';
+    roundedRect(x - 61, y - 135, 122, 34, 5); ctx.fill();
+    ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#f0d98f';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('EAST MEADOW', x, y - 121);
+    ctx.font = '14px "Fraunces", serif';
+    ctx.fillText('✦', x, y - 108);
+
+    ctx.fillStyle = 'rgba(255, 220, 130, .14)';
+    for (const lanternX of [x - 39, x + 39]) {
+      ctx.beginPath(); ctx.arc(lanternX, y - 72, 22, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#473b2f';
+      ctx.fillRect(lanternX - 5, y - 79, 10, 15);
+      ctx.fillStyle = '#f5d77f';
+      ctx.fillRect(lanternX - 3, y - 76, 6, 9);
+      ctx.fillStyle = 'rgba(255, 220, 130, .14)';
+    }
+
+    ctx.strokeStyle = '#536b3e'; ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x - 50, y - 71); ctx.quadraticCurveTo(x - 42, y - 98, x - 24, y - 105);
+    ctx.moveTo(x + 50, y - 71); ctx.quadraticCurveTo(x + 42, y - 98, x + 24, y - 105);
+    ctx.stroke();
+    for (const [leafX, leafY, angle] of [[x - 41, y - 86, -.6], [x - 30, y - 98, .5], [x + 41, y - 86, .6], [x + 30, y - 98, -.5]]) {
+      ctx.fillStyle = '#789454';
+      ctx.beginPath(); ctx.ellipse(leafX, leafY, 8, 4, angle, 0, TAU); ctx.fill();
+    }
+
     ctx.fillStyle = '#624b34';
-    ctx.fillRect(3216, 710, 7, 45);
-    ctx.fillRect(3244, 710, 7, 45);
-    ctx.fillStyle = '#b59a61';
-    ctx.fillRect(3211, 704, 45, 10);
-    ctx.fillStyle = '#514832';
-    ctx.font = '8px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('MEADOW', 3233, 701);
+    ctx.beginPath();
+    ctx.moveTo(x - 52, y - 3); ctx.lineTo(x - 20, y + 10); ctx.lineTo(x - 22, y + 63); ctx.lineTo(x - 56, y + 53); ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + 52, y - 3); ctx.lineTo(x + 20, y + 10); ctx.lineTo(x + 22, y + 63); ctx.lineTo(x + 56, y + 53); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#a27a4d'; ctx.lineWidth = 3;
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(x + side * 48, y + 9); ctx.lineTo(x + side * 25, y + 22);
+      ctx.moveTo(x + side * 48, y + 31); ctx.lineTo(x + side * 25, y + 43);
+      ctx.stroke();
+    }
   }
   function drawMeadowGround() {
     ctx.fillStyle = '#829451';
@@ -526,7 +597,7 @@
     glow.addColorStop(1, 'rgba(64, 102, 57, .2)');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, meadowWorld.width, meadowWorld.height);
-    for (let i = 0; i < 1100; i++) {
+    for (let i = 0; i < 1600; i++) {
       const x = (i * 193 + (i % 11) * 37) % meadowWorld.width;
       const y = (i * 127 + (i % 17) * 31) % meadowWorld.height;
       ctx.strokeStyle = i % 4 === 0 ? 'rgba(239, 222, 153, .4)' : 'rgba(51, 91, 48, .3)';
@@ -540,10 +611,11 @@
 
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(50, 455);
-    ctx.bezierCurveTo(275, 405, 380, 520, 600, 465);
-    ctx.bezierCurveTo(805, 415, 905, 492, 1100, 455);
-    ctx.strokeStyle = '#c2b17b'; ctx.lineWidth = 62; ctx.stroke();
+    ctx.moveTo(45, 740);
+    ctx.bezierCurveTo(440, 655, 700, 890, 1080, 760);
+    ctx.bezierCurveTo(1450, 625, 1720, 850, 2090, 735);
+    ctx.bezierCurveTo(2420, 650, 2560, 800, 2750, 740);
+    ctx.strokeStyle = '#c2b17b'; ctx.lineWidth = 78; ctx.stroke();
     ctx.strokeStyle = 'rgba(245, 225, 167, .3)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.lineCap = 'butt';
 
@@ -567,13 +639,16 @@
     ctx.fillText('STONE CIRCLE', meadowGatheringPlace.x, meadowGatheringPlace.y + 92);
 
     ctx.fillStyle = '#624b34';
-    ctx.fillRect(meadowExit.x - 19, meadowExit.y - 36, 7, 72);
-    ctx.fillRect(meadowExit.x + 12, meadowExit.y - 36, 7, 72);
+    ctx.fillRect(meadowExit.x - 30, meadowExit.y - 60, 10, 120);
+    ctx.fillRect(meadowExit.x + 20, meadowExit.y - 60, 10, 120);
     ctx.fillStyle = '#b59a61';
-    ctx.fillRect(meadowExit.x - 24, meadowExit.y - 42, 48, 9);
-    ctx.fillStyle = 'rgba(43, 61, 37, .82)';
+    ctx.fillRect(meadowExit.x - 35, meadowExit.y - 67, 70, 13);
+    ctx.fillStyle = '#49382a';
+    roundedRect(meadowExit.x - 48, meadowExit.y - 101, 96, 27, 4); ctx.fill();
+    ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#f0d98f';
     ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('VILLAGE', meadowExit.x, meadowExit.y - 48);
+    ctx.fillText('VILLAGE', meadowExit.x, meadowExit.y - 84);
   }
   function drawMeadowBloom(bloom) {
     if (bloom.taken) return;
