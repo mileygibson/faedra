@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#182a20">
-  <meta name="description" content="Explore Hartshollow as Faedra, recover the lost lights, and awaken the old forest shrine.">
+  <meta name="description" content="Explore Hartshollow and its East Meadow as Faedra, recover the lost lights, and awaken the ancient heartstones.">
   <title>Faedra: Hartshollow</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
@@ -91,7 +91,7 @@
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="Faedra exploring the forest of Hartshollow"></canvas>
+  <canvas id="game" aria-label="Faedra exploring Hartshollow, the forest, village, and East Meadow"></canvas>
   <div class="vignette" aria-hidden="true"></div>
   <div class="hud">
     <div class="brand"><div class="brand-mark">F</div><div><div class="brand-name">Faedra</div><div class="brand-sub">Hartshollow</div></div></div>
@@ -144,6 +144,7 @@
   const shrineWorld = { width: 700, height: 800 };
   const buildingWorld = { width: 700, height: 600 };
   const meadowWorld = { width: world.width, height: world.height };
+  const stoneCircleWorld = { width: 900, height: 800 };
   const keys = new Set();
   const touch = { x: 0, y: 0, actions: new Set() };
   let width = innerWidth;
@@ -159,6 +160,7 @@
   let currentBuilding = null;
   let buildingReturn = null;
   let meadowReturn = null;
+  let meadowCircleReturn = null;
   let meadowDelivered = false;
   let camera = { x: 0, y: 0 };
   let randomSeed = 8457;
@@ -193,6 +195,13 @@
   ];
   const meadowGatheringPlace = { x: 2820, y: 740 };
   const meadowExit = { x: 75, y: 740 };
+  const stoneCircleExit = { x: 450, y: 730 };
+  const stoneCircleAltar = { x: 450, y: 420 };
+  const stoneCircleInscriptions = [
+    { x: 230, y: 350, text: 'A weathered rune reads: “Bring what grows freely, and the meadow will answer.”' },
+    { x: 670, y: 350, text: 'Three carvings show flowers beneath a wide summer sky.' },
+    { x: 450, y: 185, text: 'The oldest mark says: “The circle is a promise between root and rain.”' }
+  ];
   const shrine = { x: 1844, y: 738, radius: 62 };
   const shrineAltar = { x: 350, y: 250 };
   const shrineDoor = { x: 350, y: 700 };
@@ -283,6 +292,12 @@
     { x: 1190, y: 825, homeX: 1190, homeY: 825, phase: 2.3, health: 2, alive: true, hit: 0 },
     { x: 1580, y: 1090, homeX: 1580, homeY: 1090, phase: 4.1, health: 2, alive: true, hit: 0 },
     { x: 1665, y: 536, homeX: 1665, homeY: 536, phase: 1.2, health: 2, alive: true, hit: 0 }
+  ];
+  const meadowEnemies = [
+    { x: 1030, y: 520, homeX: 1030, homeY: 520, phase: .8, health: 2, alive: true, hit: 0, kind: 'meadow' },
+    { x: 1720, y: 920, homeX: 1720, homeY: 920, phase: 2.6, health: 2, alive: true, hit: 0, kind: 'meadow' },
+    { x: 2390, y: 610, homeX: 2390, homeY: 610, phase: 4.3, health: 2, alive: true, hit: 0, kind: 'meadow' },
+    { x: 760, y: 1230, homeX: 760, homeY: 1230, phase: 1.7, health: 2, alive: true, hit: 0, kind: 'meadow' }
   ];
 
   function roundedRect(x, y, w, h, r) {
@@ -608,6 +623,7 @@
         ctx.beginPath(); ctx.arc(x + 2, y - 1, 2, 0, TAU); ctx.fill();
       }
     }
+    drawMeadowFlowers();
 
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -619,24 +635,50 @@
     ctx.strokeStyle = 'rgba(245, 225, 167, .3)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.lineCap = 'butt';
 
-    ctx.fillStyle = 'rgba(58, 84, 48, .18)';
-    ctx.beginPath(); ctx.ellipse(meadowGatheringPlace.x, meadowGatheringPlace.y + 8, 92, 72, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = 'rgba(236, 220, 166, .8)'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.ellipse(meadowGatheringPlace.x, meadowGatheringPlace.y, 74, 56, 0, 0, TAU); ctx.stroke();
-    ctx.strokeStyle = 'rgba(236, 220, 166, .42)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(meadowGatheringPlace.x, meadowGatheringPlace.y, 58, 42, 0, 0, TAU); ctx.stroke();
+    const circle = meadowGatheringPlace;
+    ctx.fillStyle = 'rgba(42, 57, 34, .3)';
+    ctx.beginPath(); ctx.ellipse(circle.x, circle.y + 16, 185, 143, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#927f58';
+    ctx.beginPath(); ctx.ellipse(circle.x, circle.y, 174, 132, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#a79768';
+    ctx.beginPath(); ctx.ellipse(circle.x, circle.y - 2, 151, 111, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(235, 221, 169, .58)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(circle.x, circle.y, 158, 118, 0, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(84, 77, 52, .45)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(circle.x, circle.y, 111, 76, 0, 0, TAU); ctx.stroke();
     for (let i = 0; i < 7; i++) {
       const angle = i * TAU / 7;
-      const x = meadowGatheringPlace.x + Math.cos(angle) * 66;
-      const y = meadowGatheringPlace.y + Math.sin(angle) * 49;
-      ctx.fillStyle = '#777c53';
-      ctx.beginPath(); ctx.ellipse(x, y, 10, 7, angle, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#b9b37a';
-      ctx.beginPath(); ctx.arc(x, y, 3, 0, TAU); ctx.fill();
+      const x = circle.x + Math.cos(angle) * 79;
+      const y = circle.y + Math.sin(angle) * 55;
+      ctx.strokeStyle = 'rgba(91, 79, 50, .42)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x - 5, y - 4); ctx.lineTo(x + 5, y + 4); ctx.stroke();
     }
-    ctx.fillStyle = 'rgba(43, 61, 37, .82)';
+    for (let i = 0; i < 10; i++) {
+      if (i === 5) continue;
+      const angle = i * TAU / 10;
+      const stoneX = circle.x + Math.cos(angle) * 145;
+      const stoneY = circle.y + Math.sin(angle) * 108;
+      const stoneHeight = 48 + i % 3 * 12;
+      ctx.fillStyle = 'rgba(37, 45, 29, .3)';
+      ctx.beginPath(); ctx.ellipse(stoneX + 5, stoneY + 5, 23, 12, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#686b50';
+      ctx.beginPath();
+      ctx.moveTo(stoneX - 16, stoneY); ctx.lineTo(stoneX - 12, stoneY - stoneHeight + 8);
+      ctx.lineTo(stoneX - 4, stoneY - stoneHeight); ctx.lineTo(stoneX + 13, stoneY - stoneHeight + 4);
+      ctx.lineTo(stoneX + 18, stoneY); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#88866a';
+      ctx.beginPath();
+      ctx.moveTo(stoneX - 11, stoneY - 5); ctx.lineTo(stoneX - 8, stoneY - stoneHeight + 9);
+      ctx.lineTo(stoneX + 7, stoneY - stoneHeight + 8); ctx.lineTo(stoneX + 11, stoneY - 4);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(55, 55, 39, .75)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(stoneX, stoneY - 12); ctx.lineTo(stoneX - 4, stoneY - 23); ctx.lineTo(stoneX + 2, stoneY - 31); ctx.stroke();
+      ctx.fillStyle = '#d6c77e';
+      ctx.beginPath(); ctx.arc(stoneX - 3, stoneY - stoneHeight - 4, 2, 0, TAU); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(43, 61, 37, .9)';
     ctx.font = '11px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('STONE CIRCLE', meadowGatheringPlace.x, meadowGatheringPlace.y + 92);
+    ctx.fillText('STONE CIRCLE', circle.x, circle.y + 157);
 
     ctx.fillStyle = '#624b34';
     ctx.fillRect(meadowExit.x - 30, meadowExit.y - 60, 10, 120);
@@ -649,6 +691,29 @@
     ctx.fillStyle = '#f0d98f';
     ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
     ctx.fillText('VILLAGE', meadowExit.x, meadowExit.y - 84);
+  }
+  function drawMeadowFlowers() {
+    const colors = ['#e9d477', '#f0eee0', '#d999a1', '#a8c6dc'];
+    for (let i = 0; i < 28; i++) {
+      const x = 170 + (i * 829) % 2960;
+      const y = 90 + (i * 457) % 1320;
+      if (Math.abs(y - (740 + Math.sin(x / 370) * 55)) < 115) continue;
+      if (distance({ x, y }, meadowGatheringPlace) < 225) continue;
+      if (meadowBlooms.some(bloom => Math.hypot(x - bloom.x, y - bloom.y) < 115)) continue;
+      for (let flower = 0; flower < 5; flower++) {
+        const flowerX = x + (flower % 3 - 1) * 12;
+        const flowerY = y + Math.floor(flower / 3) * 13 + (flower % 2) * 3;
+        ctx.strokeStyle = '#526d3e'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(flowerX, flowerY + 6); ctx.lineTo(flowerX + 1, flowerY + 15); ctx.stroke();
+        ctx.fillStyle = colors[(i + flower) % colors.length];
+        for (let petal = 0; petal < 5; petal++) {
+          const angle = petal * TAU / 5;
+          ctx.beginPath(); ctx.arc(flowerX + Math.cos(angle) * 3, flowerY + Math.sin(angle) * 3, 2.4, 0, TAU); ctx.fill();
+        }
+        ctx.fillStyle = '#f5dc8e';
+        ctx.beginPath(); ctx.arc(flowerX, flowerY, 1.8, 0, TAU); ctx.fill();
+      }
+    }
   }
   function drawMeadowBloom(bloom) {
     if (bloom.taken) return;
@@ -666,6 +731,97 @@
     }
     ctx.fillStyle = '#fff2b0';
     ctx.beginPath(); ctx.arc(bloom.x, bloom.y, 3, 0, TAU); ctx.fill();
+  }
+  function drawStoneCircleInterior() {
+    ctx.fillStyle = '#7b8d4e';
+    ctx.fillRect(0, 0, stoneCircleWorld.width, stoneCircleWorld.height);
+    const glow = ctx.createRadialGradient(450, 365, 25, 450, 365, 460);
+    glow.addColorStop(0, 'rgba(236, 213, 130, .34)');
+    glow.addColorStop(1, 'rgba(33, 54, 35, .22)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, stoneCircleWorld.width, stoneCircleWorld.height);
+    for (let i = 0; i < 380; i++) {
+      const x = (i * 137 + (i % 9) * 31) % stoneCircleWorld.width;
+      const y = (i * 83 + (i % 13) * 29) % stoneCircleWorld.height;
+      ctx.fillStyle = i % 3 ? 'rgba(214, 208, 137, .22)' : 'rgba(42, 71, 41, .26)';
+      ctx.fillRect(x, y, 2, 3);
+    }
+
+    ctx.fillStyle = 'rgba(37, 48, 30, .28)';
+    ctx.beginPath(); ctx.ellipse(450, 390, 310, 260, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#9b8a60';
+    ctx.beginPath(); ctx.ellipse(450, 375, 300, 250, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#b1a171';
+    ctx.beginPath(); ctx.ellipse(450, 375, 257, 211, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(235, 222, 172, .65)'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(450, 375, 270, 222, 0, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(78, 71, 48, .4)'; ctx.lineWidth = 2;
+    for (let row = 0; row < 8; row++) {
+      const y = 230 + row * 42;
+      ctx.beginPath(); ctx.moveTo(215, y); ctx.quadraticCurveTo(450, y + (row % 2 ? 8 : -8), 685, y); ctx.stroke();
+    }
+
+    const pillars = [
+      [450, 145, 110], [620, 190, 96], [730, 340, 112], [690, 540, 92],
+      [540, 600, 102], [360, 600, 95], [210, 510, 108], [170, 335, 92],
+      [285, 190, 100]
+    ];
+    for (let i = 0; i < pillars.length; i++) {
+      const [x, y, h] = pillars[i];
+      ctx.fillStyle = 'rgba(36, 44, 30, .3)';
+      ctx.beginPath(); ctx.ellipse(x + 6, y + 5, 24, 13, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = i % 2 ? '#666a50' : '#74755a';
+      ctx.beginPath();
+      ctx.moveTo(x - 19, y); ctx.lineTo(x - 15, y - h + 14); ctx.lineTo(x - 5, y - h);
+      ctx.lineTo(x + 17, y - h + 7); ctx.lineTo(x + 21, y); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(183, 174, 130, .58)';
+      ctx.beginPath(); ctx.moveTo(x - 12, y - 8); ctx.lineTo(x - 10, y - h + 17); ctx.lineTo(x + 3, y - h + 13); ctx.lineTo(x + 7, y - 8); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#4d503f'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 20); ctx.lineTo(x - 6, y - 37); ctx.lineTo(x + 1, y - 54);
+      ctx.moveTo(x + 1, y - 43); ctx.lineTo(x + 8, y - 52);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(36, 46, 31, .3)';
+    ctx.beginPath(); ctx.ellipse(stoneCircleAltar.x + 5, stoneCircleAltar.y + 15, 105, 59, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#716d51';
+    ctx.beginPath(); ctx.ellipse(stoneCircleAltar.x, stoneCircleAltar.y + 10, 98, 52, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#a99a70';
+    ctx.beginPath(); ctx.ellipse(stoneCircleAltar.x, stoneCircleAltar.y, 87, 43, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#747458';
+    ctx.beginPath(); ctx.moveTo(395, 404); ctx.lineTo(407, 374); ctx.lineTo(493, 374); ctx.lineTo(505, 404); ctx.lineTo(495, 435); ctx.lineTo(405, 435); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a69a73';
+    ctx.beginPath(); ctx.moveTo(405, 398); ctx.lineTo(414, 380); ctx.lineTo(486, 380); ctx.lineTo(495, 398); ctx.lineTo(488, 426); ctx.lineTo(412, 426); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#4f5940';
+    ctx.beginPath(); ctx.ellipse(450, 390, 29, 13, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(231, 220, 165, .62)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(450, 390, 38, 19, 0, 0, TAU); ctx.stroke();
+    const altarGlow = ctx.createRadialGradient(450, 383, 2, 450, 383, meadowDelivered ? 74 : 40);
+    altarGlow.addColorStop(0, meadowDelivered ? 'rgba(255, 238, 164, .8)' : 'rgba(226, 214, 161, .42)');
+    altarGlow.addColorStop(1, 'rgba(255, 226, 122, 0)');
+    ctx.fillStyle = altarGlow; ctx.beginPath(); ctx.arc(450, 383, meadowDelivered ? 74 : 40, 0, TAU); ctx.fill();
+    if (meadowDelivered) {
+      for (let i = 0; i < 3; i++) {
+        const angle = elapsed * .4 + i * TAU / 3;
+        ctx.fillStyle = ['#f5d875', '#9dc8dc', '#e8a4a0'][i];
+        ctx.beginPath(); ctx.arc(450 + Math.cos(angle) * 22, 385 + Math.sin(angle) * 9, 5, 0, TAU); ctx.fill();
+      }
+    }
+
+    for (const inscription of stoneCircleInscriptions) {
+      ctx.fillStyle = 'rgba(39, 48, 32, .78)';
+      ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+      ctx.fillText('ᚠ', inscription.x, inscription.y);
+    }
+    ctx.fillStyle = '#8f8464';
+    ctx.fillRect(416, 731, 68, 13);
+    ctx.fillRect(424, 744, 52, 12);
+    ctx.fillStyle = 'rgba(226, 216, 170, .42)';
+    ctx.fillRect(420, 733, 60, 3);
+    ctx.fillStyle = 'rgba(39, 48, 32, .82)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('THE MEADOW HEART', 450, 690);
   }
   function drawBuildingInterior() {
     const interior = buildingInteriors[currentBuilding.kind];
@@ -914,14 +1070,15 @@
     if (!enemy.alive) return;
     const bob = Math.sin(elapsed * 4 + enemy.phase) * 5;
     const x = enemy.x, y = enemy.y + bob;
+    const meadowWisp = enemy.kind === 'meadow';
     const glow = ctx.createRadialGradient(x, y, 2, x, y, 30);
-    glow.addColorStop(0, enemy.hit > 0 ? 'rgba(255, 244, 215, .55)' : 'rgba(169, 213, 214, .34)');
-    glow.addColorStop(1, 'rgba(125, 196, 198, 0)');
+    glow.addColorStop(0, enemy.hit > 0 ? 'rgba(255, 244, 215, .55)' : meadowWisp ? 'rgba(241, 210, 135, .4)' : 'rgba(169, 213, 214, .34)');
+    glow.addColorStop(1, meadowWisp ? 'rgba(221, 175, 96, 0)' : 'rgba(125, 196, 198, 0)');
     ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 30, 0, TAU); ctx.fill();
-    ctx.fillStyle = enemy.hit > 0 ? '#fff1cb' : '#b4d8cf';
+    ctx.fillStyle = enemy.hit > 0 ? '#fff1cb' : meadowWisp ? '#e5d39a' : '#b4d8cf';
     ctx.beginPath(); ctx.arc(x, y, 11, Math.PI, 0); ctx.lineTo(x + 11, y + 7);
     ctx.lineTo(x + 5, y + 4); ctx.lineTo(x, y + 9); ctx.lineTo(x - 5, y + 4); ctx.lineTo(x - 11, y + 7); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#405b4e';
+    ctx.fillStyle = meadowWisp ? '#69533a' : '#405b4e';
     ctx.beginPath(); ctx.arc(x - 4, y - 1, 1.5, 0, TAU); ctx.arc(x + 4, y - 1, 1.5, 0, TAU); ctx.fill();
     if (enemy.health < 2) {
       ctx.fillStyle = 'rgba(30, 43, 33, .7)'; ctx.fillRect(x - 10, y - 17, 20, 3);
@@ -1015,8 +1172,14 @@
     ctx.globalAlpha = 1;
   }
   function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+  function enemiesForScene() {
+    if (scene === 'meadow') return meadowEnemies;
+    if (scene === 'forest') return enemies;
+    return [];
+  }
   function blocked(x, y) {
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
+    if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
     if (scene === 'building') {
       if (x < 95 || x > 605 || y < 110 || y > 560) return true;
       if (y > 540 && (x < 300 || x > 400)) return true;
@@ -1046,6 +1209,19 @@
     return false;
   }
   function interactable() {
+    if (scene === 'stoneCircle') {
+      const targets = [
+        { type: 'circleAltar', item: stoneCircleAltar, range: 70 },
+        { type: 'circleExit', item: stoneCircleExit, range: 62 },
+        ...stoneCircleInscriptions.map(item => ({ type: 'circleInscription', item, range: 52 }))
+      ];
+      let nearest = null, nearestDistance = Infinity;
+      for (const target of targets) {
+        const d = distance(player, target.item);
+        if (d < nearestDistance && d < target.range) { nearest = target; nearestDistance = d; }
+      }
+      return nearest;
+    }
     if (scene === 'meadow') {
       const targets = [
         { type: 'meadowExit', item: meadowExit, range: 60 },
@@ -1118,9 +1294,10 @@
     toastTimer = 3.2;
   }
   function updateHud() {
-    seedLabel.textContent = scene === 'meadow' ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = scene === 'meadow' ? meadowDelivered ? 'The meadow is in bloom' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    const meadowScene = scene === 'meadow' || scene === 'stoneCircle';
+    seedLabel.textContent = meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
+    areaLabel.textContent = scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    questLabel.textContent = scene === 'stoneCircle' ? meadowDelivered ? 'The heartstone glows with blooms' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'The meadow is in bloom' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -1138,7 +1315,7 @@
     if (player.attackCooldown > 0) return;
     player.attack = .24;
     player.attackCooldown = .42;
-    for (const enemy of enemies) {
+    for (const enemy of enemiesForScene()) {
       if (!enemy.alive) continue;
       const dx = enemy.x - player.x, dy = enemy.y - player.y;
       const d = Math.hypot(dx, dy);
@@ -1153,6 +1330,28 @@
   function performInteract() {
     const target = interactable();
     if (!target) return;
+    if (scene === 'stoneCircle') {
+      if (target.type === 'circleExit') {
+        scene = 'meadow';
+        player.x = meadowCircleReturn.x;
+        player.y = meadowCircleReturn.y;
+        player.faceX = 0;
+        player.faceY = 1;
+        meadowCircleReturn = null;
+        updateHud();
+        say('You step back into the open meadow.');
+      } else if (target.type === 'circleInscription') say(target.item.text);
+      else if (target.type === 'circleAltar') {
+        if (meadowDelivered) say('The heartstone glows softly around the three flowers.');
+        else if (!meadowBlooms.every(bloom => bloom.taken)) say('The heartstone is waiting. Gather all three meadow blooms first.');
+        else {
+          meadowDelivered = true;
+          updateHud();
+          say('You place the three blooms on the heartstone. Light ripples through the circle.');
+        }
+      }
+      return;
+    }
     if (scene === 'meadow') {
       if (target.type === 'meadowExit') {
         scene = 'forest';
@@ -1164,13 +1363,15 @@
         updateHud();
         say('You return to the village lane.');
       } else if (target.type === 'meadowGatheringPlace') {
-        if (meadowDelivered) say('The stone circle glows softly among the meadow flowers.');
-        else if (!meadowBlooms.every(bloom => bloom.taken)) say('The stone circle is waiting. Gather all three meadow blooms first.');
-        else {
-          meadowDelivered = true;
-          updateHud();
-          say('You lay the three blooms in the stone circle. The meadow answers with a wash of light.');
-        }
+        meadowCircleReturn = { x: player.x, y: player.y };
+        scene = 'stoneCircle';
+        player.x = 450;
+        player.y = 635;
+        player.faceX = 0;
+        player.faceY = -1;
+        player.jumpTime = 0;
+        updateHud();
+        say('You step into the old stone circle.');
       }
       return;
     }
@@ -1268,11 +1469,17 @@
       if (scene === 'shrine') {
         player.x = 350;
         player.y = 610;
+      } else if (scene === 'stoneCircle') {
+        player.x = 450;
+        player.y = 635;
+      } else if (scene === 'meadow') {
+        player.x = 155;
+        player.y = meadowExit.y;
       } else {
         player.x = 272;
         player.y = 738;
       }
-      say('The forest gently returns you to the old path.');
+      say(scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : 'The forest gently returns you to the old path.');
     } else say('A wisp brushes past. Keep your distance or strike back.');
     updateHud();
   }
@@ -1310,16 +1517,16 @@
           updateHud();
         }
       }
-      for (const enemy of enemies) {
-        if (!enemy.alive) continue;
-        enemy.hit = Math.max(0, enemy.hit - dt);
-        enemy.phase += dt;
-        const targetX = enemy.homeX + Math.sin(enemy.phase * .55) * 30;
-        const targetY = enemy.homeY + Math.cos(enemy.phase * .7) * 24;
-        enemy.x += (targetX - enemy.x) * dt * .7;
-        enemy.y += (targetY - enemy.y) * dt * .7;
-        if (distance(player, enemy) < 24 && player.jump < 10) damage();
-      }
+    }
+    for (const enemy of enemiesForScene()) {
+      if (!enemy.alive) continue;
+      enemy.hit = Math.max(0, enemy.hit - dt);
+      enemy.phase += dt;
+      const targetX = enemy.homeX + Math.sin(enemy.phase * .55) * 30;
+      const targetY = enemy.homeY + Math.cos(enemy.phase * .7) * 24;
+      enemy.x += (targetX - enemy.x) * dt * .7;
+      enemy.y += (targetY - enemy.y) * dt * .7;
+      if (distance(player, enemy) < 24 && player.jump < 10) damage();
     }
     if (scene === 'meadow') {
       for (const bloom of meadowBlooms) {
@@ -1337,7 +1544,10 @@
         shrine: player.collected === 3 ? 'E  Enter the ancient shrine' : 'The old shrine is waiting for three lights',
         meadowGate: 'E  Follow the eastern lane to the meadow',
         meadowExit: 'E  Return to the village',
-        meadowGatheringPlace: meadowDelivered ? 'The meadow is in bloom' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms in the stone circle' : 'The stone circle is waiting for three blooms',
+        meadowGatheringPlace: 'E  Explore the stone circle',
+        circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
+        circleInscription: 'E  Read the stone carving',
+        circleExit: 'E  Return to the meadow',
         altar: shrineAwakened ? 'E  Listen to the heartwood' : 'E  Set the lights into the altar',
         inscription: 'E  Read the inscription',
         exit: 'E  Return to the forest'
@@ -1346,7 +1556,7 @@
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
-    const activeWorld = scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
+    const activeWorld = scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
     const viewW = width, viewH = height;
     camera.x = activeWorld.width < viewW ? (activeWorld.width - viewW) / 2 : Math.max(0, Math.min(activeWorld.width - viewW, player.x - viewW / 2));
     camera.y = activeWorld.height < viewH ? (activeWorld.height - viewH) / 2 : Math.max(0, Math.min(activeWorld.height - viewH, player.y - viewH / 2));
@@ -1356,14 +1566,20 @@
     ctx.clearRect(0, 0, width, height);
     ctx.save();
     ctx.translate(-camera.x, -camera.y);
-    if (scene === 'building') {
+    if (scene === 'stoneCircle') {
+      drawStoneCircleInterior();
+      drawPlayer();
+    } else if (scene === 'building') {
       drawBuildingInterior();
       drawForestPerson(buildingInteriors[currentBuilding.kind].resident);
       drawPlayer();
     } else if (scene === 'meadow') {
       drawMeadowGround();
       for (const bloom of meadowBlooms) drawMeadowBloom(bloom);
-      drawPlayer();
+      const actors = meadowEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      actors.push({ y: player.y, draw: drawPlayer });
+      actors.sort((a, b) => a.y - b.y);
+      for (const actor of actors) actor.draw();
     } else if (scene === 'shrine') {
       drawShrineInterior();
       drawPlayer();
