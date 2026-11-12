@@ -145,6 +145,7 @@
   const buildingWorld = { width: 700, height: 600 };
   const meadowWorld = { width: world.width, height: world.height };
   const stoneCircleWorld = { width: 900, height: 800 };
+  const lakeWorld = { width: 1400, height: 900 };
   const keys = new Set();
   const touch = { x: 0, y: 0, actions: new Set() };
   let width = innerWidth;
@@ -161,6 +162,7 @@
   let buildingReturn = null;
   let meadowReturn = null;
   let meadowCircleReturn = null;
+  let lakeReturn = null;
   let meadowDelivered = false;
   let camera = { x: 0, y: 0 };
   let randomSeed = 8457;
@@ -195,6 +197,7 @@
   ];
   const meadowGatheringPlace = { x: 2820, y: 740 };
   const meadowLake = { x: 1900, y: 1275 };
+  const lakeExit = { x: 90, y: 450 };
   const meadowExit = { x: 75, y: 740 };
   const meadowGuide = {
     x: 320, y: 740, name: 'Lark', robe: '#8b9861', hair: '#b57b55', spoken: false,
@@ -208,8 +211,8 @@
     { x: 450, y: 185, text: 'The oldest mark says: “The circle is a promise between root and rain.”' }
   ];
   const lakeGuide = {
-    x: 700, y: 545, name: 'Neris', robe: '#64828a', hair: '#d1b27b', spoken: false,
-    text: 'The blooms have awakened the heartstone. Now follow the water south to the lake. Its stream joins the river you crossed in the forest; perhaps the current has a story of its own.'
+    x: 2550, y: 740, name: 'Neris', robe: '#64828a', hair: '#d1b27b', spoken: false,
+    text: 'The blooms have awakened the heartstone. Head south through the meadow to the lake. Its stream runs west and joins the river you crossed in the forest; perhaps the current has a story of its own.'
   };
   const shrine = { x: 1844, y: 738, radius: 62 };
   const shrineAltar = { x: 350, y: 250 };
@@ -644,7 +647,7 @@
     ctx.strokeStyle = 'rgba(245, 225, 167, .3)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.lineCap = 'butt';
 
-    drawMeadowLake();
+    drawMeadowLakeEntrance();
     const circle = meadowGatheringPlace;
     ctx.fillStyle = 'rgba(42, 57, 34, .3)';
     ctx.beginPath(); ctx.ellipse(circle.x, circle.y + 16, 185, 143, 0, 0, TAU); ctx.fill();
@@ -726,42 +729,80 @@
       }
     }
   }
-  function drawMeadowLake() {
+  function drawMeadowLakeEntrance() {
     const { x, y } = meadowLake;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = '#637e55'; ctx.lineWidth = 102;
+    ctx.strokeStyle = '#c2b17b'; ctx.lineWidth = 68;
     ctx.beginPath();
-    ctx.moveTo(0, 1120);
-    ctx.bezierCurveTo(520, 1085, 930, 1355, 1330, 1270);
-    ctx.bezierCurveTo(1490, 1235, 1570, 1285, 1680, 1275);
+    ctx.moveTo(1940, 790);
+    ctx.bezierCurveTo(1990, 940, 1770, 1050, x, y - 45);
     ctx.stroke();
-    ctx.strokeStyle = '#448c86'; ctx.lineWidth = 84;
-    ctx.beginPath();
-    ctx.moveTo(0, 1120);
-    ctx.bezierCurveTo(520, 1085, 930, 1355, 1330, 1270);
-    ctx.bezierCurveTo(1490, 1235, 1570, 1285, 1680, 1275);
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(34, 57, 48, .3)';
-    ctx.beginPath(); ctx.ellipse(x + 5, y + 15, 265, 165, -.08, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(245, 225, 167, .3)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.lineCap = 'butt';
+    ctx.fillStyle = 'rgba(34, 57, 48, .25)';
+    ctx.beginPath(); ctx.ellipse(x, y + 6, 79, 37, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#637e55';
+    ctx.beginPath(); ctx.ellipse(x, y, 72, 31, 0, 0, TAU); ctx.fill();
     ctx.fillStyle = '#448c86';
-    ctx.beginPath(); ctx.ellipse(x, y, 258, 158, -.08, 0, TAU); ctx.fill();
-    ctx.strokeStyle = 'rgba(186, 218, 174, .52)'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.ellipse(x, y, 243, 145, -.08, 0, TAU); ctx.stroke();
-    ctx.fillStyle = 'rgba(177, 219, 194, .25)';
-    ctx.beginPath(); ctx.ellipse(x + 35, y - 32, 92, 24, -.12, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(x - 86, y + 42, 63, 13, .16, 0, TAU); ctx.fill();
-    for (let i = 0; i < 13; i++) {
-      const rippleX = x - 178 + i * 29;
-      const rippleY = y + Math.sin(i * 1.4) * 74;
-      ctx.strokeStyle = 'rgba(211, 231, 188, .43)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 8 + i % 4 * 3, 3, -.12, 0, Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x, y - 2, 60, 22, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(186, 218, 174, .52)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(x, y - 2, 55, 17, 0, 0, TAU); ctx.stroke();
+    ctx.fillStyle = '#49382a';
+    roundedRect(x - 70, y - 86, 140, 27, 4); ctx.fill();
+    ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#f0d98f';
+    ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('SOUTH LAKE', x, y - 69);
+    for (const reedX of [x - 85, x - 76, x + 76, x + 85]) {
+      ctx.strokeStyle = '#526d3e'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(reedX, y + 13); ctx.quadraticCurveTo(reedX - 7, y - 1, reedX + 2, y - 18); ctx.stroke();
+      ctx.fillStyle = '#789454';
+      ctx.beginPath(); ctx.ellipse(reedX + 3, y - 12, 8, 3, -.55, 0, TAU); ctx.fill();
+    }
+  }
+  function drawLakeArea() {
+    const x = 850, y = 425;
+    ctx.fillStyle = '#78904e';
+    ctx.fillRect(0, 0, lakeWorld.width, lakeWorld.height);
+    const sunlight = ctx.createLinearGradient(0, 0, lakeWorld.width, lakeWorld.height);
+    sunlight.addColorStop(0, 'rgba(225, 208, 126, .18)');
+    sunlight.addColorStop(1, 'rgba(43, 74, 51, .22)');
+    ctx.fillStyle = sunlight;
+    ctx.fillRect(0, 0, lakeWorld.width, lakeWorld.height);
+    for (let i = 0; i < 540; i++) {
+      const px = (i * 131 + (i % 11) * 29) % lakeWorld.width;
+      const py = (i * 97 + (i % 13) * 23) % lakeWorld.height;
+      ctx.fillStyle = i % 3 ? 'rgba(218, 211, 140, .22)' : 'rgba(48, 77, 47, .24)';
+      ctx.fillRect(px, py, 2 + i % 2, 2);
     }
 
-    for (let i = 0; i < 24; i++) {
-      const angle = i * TAU / 24;
-      const bankX = x + Math.cos(angle) * (264 + i % 3 * 5);
-      const bankY = y + Math.sin(angle) * (164 + i % 3 * 5);
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#637e55'; ctx.lineWidth = 102;
+    ctx.beginPath(); ctx.moveTo(0, 450); ctx.bezierCurveTo(240, 430, 340, 500, 485, 455); ctx.stroke();
+    ctx.strokeStyle = '#448c86'; ctx.lineWidth = 84;
+    ctx.beginPath(); ctx.moveTo(0, 450); ctx.bezierCurveTo(240, 430, 340, 500, 485, 455); ctx.stroke();
+    ctx.lineCap = 'butt';
+
+    ctx.fillStyle = 'rgba(34, 57, 48, .3)';
+    ctx.beginPath(); ctx.ellipse(x + 5, y + 15, 330, 215, -.08, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#448c86';
+    ctx.beginPath(); ctx.ellipse(x, y, 322, 207, -.08, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(186, 218, 174, .52)'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(x, y, 305, 190, -.08, 0, TAU); ctx.stroke();
+    ctx.fillStyle = 'rgba(177, 219, 194, .25)';
+    ctx.beginPath(); ctx.ellipse(x + 52, y - 42, 128, 28, -.12, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x - 118, y + 58, 84, 16, .16, 0, TAU); ctx.fill();
+    for (let i = 0; i < 21; i++) {
+      const rippleX = x - 240 + i * 23;
+      const rippleY = y + Math.sin(i * 1.4) * 104;
+      ctx.strokeStyle = 'rgba(211, 231, 188, .43)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 9 + i % 4 * 4, 3, -.12, 0, Math.PI); ctx.stroke();
+    }
+
+    for (let i = 0; i < 32; i++) {
+      const angle = i * TAU / 32;
+      const bankX = x + Math.cos(angle) * (330 + i % 3 * 5);
+      const bankY = y + Math.sin(angle) * (214 + i % 3 * 5);
       ctx.fillStyle = i % 3 ? '#68854c' : '#829456';
       ctx.beginPath(); ctx.ellipse(bankX, bankY, 16, 7, angle, 0, TAU); ctx.fill();
       if (i % 3 === 0) {
@@ -769,11 +810,31 @@
         ctx.beginPath(); ctx.arc(bankX + 2, bankY - 4, 3, 0, TAU); ctx.fill();
       }
     }
+    for (const [rockX, rockY, radius] of [[640, 345, 15], [710, 530, 11], [1050, 325, 18], [1120, 500, 13], [800, 640, 12]]) {
+      drawStone({ x: rockX, y: rockY, r: radius, light: .7 });
+    }
+    ctx.fillStyle = '#765b3c';
+    ctx.fillRect(305, 515, 145, 16);
+    ctx.fillRect(315, 531, 9, 48);
+    ctx.fillRect(429, 531, 9, 48);
+    ctx.fillStyle = '#b08b58';
+    ctx.fillRect(312, 511, 131, 7);
+    ctx.strokeStyle = 'rgba(67, 53, 38, .55)'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let plank = 0; plank < 6; plank++) {
+      ctx.moveTo(320 + plank * 22, 516); ctx.lineTo(320 + plank * 22, 529);
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#49382a';
+    roundedRect(490, 153, 170, 35, 4); ctx.fill();
+    ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#f0d98f';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('SOUTH LAKE', 575, 175);
     ctx.fillStyle = 'rgba(43, 61, 37, .88)';
-    ctx.font = '12px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('SOUTH LAKE', x, y + 202);
-    ctx.font = '9px "DM Mono", monospace';
-    ctx.fillText('A STREAM RUNS WEST TO THE FOREST RIVER', x, y + 220);
+    ctx.font = '10px "DM Mono", monospace';
+    ctx.fillText('THE FOREST RIVER FLOWS IN FROM THE WEST', 850, 710);
+    ctx.fillText('A narrow stream joins the lake here.', 850, 734);
     ctx.lineCap = 'butt';
   }
   function drawMeadowBloom(bloom) {
@@ -1241,6 +1302,7 @@
   function blocked(x, y) {
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
     if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
+    if (scene === 'lake') return x < 24 || y < 24 || x > lakeWorld.width - 24 || y > lakeWorld.height - 24;
     if (scene === 'building') {
       if (x < 95 || x > 605 || y < 110 || y > 560) return true;
       if (y > 540 && (x < 300 || x > 400)) return true;
@@ -1274,8 +1336,7 @@
       const targets = [
         { type: 'circleAltar', item: stoneCircleAltar, range: 70 },
         { type: 'circleExit', item: stoneCircleExit, range: 62 },
-        ...stoneCircleInscriptions.map(item => ({ type: 'circleInscription', item, range: 52 })),
-        ...(meadowDelivered ? [{ type: 'lakeGuide', item: lakeGuide, range: 58 }] : [])
+        ...stoneCircleInscriptions.map(item => ({ type: 'circleInscription', item, range: 52 }))
       ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
@@ -1288,7 +1349,9 @@
       const targets = [
         { type: 'meadowExit', item: meadowExit, range: 60 },
         { type: 'meadowPerson', item: meadowGuide, range: 56 },
-        { type: 'meadowGatheringPlace', item: meadowGatheringPlace, range: 78 }
+        { type: 'meadowGatheringPlace', item: meadowGatheringPlace, range: 78 },
+        { type: 'lakeEntrance', item: meadowLake, range: 74 },
+        ...(meadowDelivered ? [{ type: 'lakeGuide', item: lakeGuide, range: 58 }] : [])
       ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
@@ -1296,6 +1359,10 @@
         if (d < nearestDistance && d < target.range) { nearest = target; nearestDistance = d; }
       }
       return nearest;
+    }
+    if (scene === 'lake') {
+      const d = distance(player, lakeExit);
+      return d < 62 ? { type: 'lakeExit', item: lakeExit } : null;
     }
     if (scene === 'building') {
       const interior = buildingInteriors[currentBuilding.kind];
@@ -1357,10 +1424,10 @@
     toastTimer = 3.2;
   }
   function updateHud() {
-    const meadowScene = scene === 'meadow' || scene === 'stoneCircle';
+    const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || scene === 'lake';
     seedLabel.textContent = meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    areaLabel.textContent = scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    questLabel.textContent = scene === 'lake' ? 'The forest river flows in from the west' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -1394,10 +1461,7 @@
     const target = interactable();
     if (!target) return;
     if (scene === 'stoneCircle') {
-      if (target.type === 'lakeGuide') {
-        target.item.spoken = true;
-        say(target.item.text);
-      } else if (target.type === 'circleExit') {
+      if (target.type === 'circleExit') {
         scene = 'meadow';
         player.x = meadowCircleReturn.x;
         player.y = meadowCircleReturn.y;
@@ -1431,6 +1495,9 @@
       } else if (target.type === 'meadowPerson') {
         target.item.spoken = true;
         say(target.item.text);
+      } else if (target.type === 'lakeGuide') {
+        target.item.spoken = true;
+        say(target.item.text);
       } else if (target.type === 'meadowGatheringPlace') {
         meadowCircleReturn = { x: player.x, y: player.y };
         scene = 'stoneCircle';
@@ -1441,6 +1508,29 @@
         player.jumpTime = 0;
         updateHud();
         say('You step into the old stone circle.');
+      } else if (target.type === 'lakeEntrance') {
+        lakeReturn = { x: player.x, y: player.y };
+        scene = 'lake';
+        player.x = 160;
+        player.y = 450;
+        player.faceX = 1;
+        player.faceY = 0;
+        player.jumpTime = 0;
+        updateHud();
+        say('You follow the stream down to the South Lake.');
+      }
+      return;
+    }
+    if (scene === 'lake') {
+      if (target.type === 'lakeExit') {
+        scene = 'meadow';
+        player.x = lakeReturn.x;
+        player.y = lakeReturn.y;
+        player.faceX = 0;
+        player.faceY = -1;
+        lakeReturn = null;
+        updateHud();
+        say('You follow the stream back into the meadow.');
       }
       return;
     }
@@ -1544,11 +1634,14 @@
       } else if (scene === 'meadow') {
         player.x = 155;
         player.y = meadowExit.y;
+      } else if (scene === 'lake') {
+        player.x = 160;
+        player.y = 450;
       } else {
         player.x = 272;
         player.y = 738;
       }
-      say(scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : 'The forest gently returns you to the old path.');
+      say(scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
     } else say('A wisp brushes past. Keep your distance or strike back.');
     updateHud();
   }
@@ -1615,10 +1708,12 @@
         meadowExit: 'E  Return to the village',
         meadowPerson: `E  Talk to ${meadowGuide.name}`,
         meadowGatheringPlace: 'E  Explore the stone circle',
+        lakeEntrance: 'E  Follow the stream to the South Lake',
         circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
         circleInscription: 'E  Read the stone carving',
         circleExit: 'E  Return to the meadow',
         lakeGuide: `E  Talk to ${lakeGuide.name}`,
+        lakeExit: 'E  Follow the stream back to the meadow',
         altar: shrineAwakened ? 'E  Listen to the heartwood' : 'E  Set the lights into the altar',
         inscription: 'E  Read the inscription',
         exit: 'E  Return to the forest'
@@ -1627,7 +1722,7 @@
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
-    const activeWorld = scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
+    const activeWorld = scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
     const viewW = width, viewH = height;
     camera.x = activeWorld.width < viewW ? (activeWorld.width - viewW) / 2 : Math.max(0, Math.min(activeWorld.width - viewW, player.x - viewW / 2));
     camera.y = activeWorld.height < viewH ? (activeWorld.height - viewH) / 2 : Math.max(0, Math.min(activeWorld.height - viewH, player.y - viewH / 2));
@@ -1637,9 +1732,11 @@
     ctx.clearRect(0, 0, width, height);
     ctx.save();
     ctx.translate(-camera.x, -camera.y);
-    if (scene === 'stoneCircle') {
+    if (scene === 'lake') {
+      drawLakeArea();
+      drawPlayer();
+    } else if (scene === 'stoneCircle') {
       drawStoneCircleInterior();
-      if (meadowDelivered) drawForestPerson(lakeGuide);
       drawPlayer();
     } else if (scene === 'building') {
       drawBuildingInterior();
@@ -1650,6 +1747,7 @@
       for (const bloom of meadowBlooms) drawMeadowBloom(bloom);
       const actors = meadowEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
       actors.push({ y: meadowGuide.y, draw: () => drawForestPerson(meadowGuide) });
+      if (meadowDelivered) actors.push({ y: lakeGuide.y, draw: () => drawForestPerson(lakeGuide) });
       actors.push({ y: player.y, draw: drawPlayer });
       actors.sort((a, b) => a.y - b.y);
       for (const actor of actors) actor.draw();
