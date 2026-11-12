@@ -146,6 +146,7 @@
   const meadowWorld = { width: world.width, height: world.height };
   const stoneCircleWorld = { width: 900, height: 800 };
   const lakeWorld = { width: world.width, height: world.height };
+  const moonstoneWorld = { width: 900, height: 800 };
   const keys = new Set();
   const touch = { x: 0, y: 0, actions: new Set() };
   let width = innerWidth;
@@ -163,6 +164,7 @@
   let meadowReturn = null;
   let meadowCircleReturn = null;
   let lakeReturn = null;
+  let moonstoneReturn = null;
   let meadowDelivered = false;
   let camera = { x: 0, y: 0 };
   let randomSeed = 8457;
@@ -200,6 +202,7 @@
   const lakeExit = { x: 90, y: 750 };
   let inBoat = false;
   const lakeBoat = { x: 850, y: 750 };
+  const moonstoneEntrance = { x: 1925, y: 755 };
   const lakeIslands = [
     { x: 1390, y: 400, radiusX: 125, radiusY: 82, name: 'Reed Isle' },
     { x: 1680, y: 1120, radiusX: 130, radiusY: 88, name: 'Willow Isle' },
@@ -213,7 +216,8 @@
     { x: 2500, y: 410, name: 'the sunken riverstone', color: '#9dc8dc', taken: false },
     { x: 2710, y: 1070, name: 'the moonlit lily charm', color: '#e8a4b8', taken: false }
   ];
-  const lakeAltar = { x: 2050, y: 755 };
+  const moonstoneAltar = { x: 450, y: 390 };
+  const moonstoneExit = { x: 450, y: 720 };
   let lakeItemsDelivered = false;
   const lakeDocks = [
     { x: 850, y: 750, landX: 650, landY: 750, width: 380, name: 'the west dock' },
@@ -888,21 +892,28 @@
     }
 
     if (island.name === 'Moonstone Isle') {
-      ctx.fillStyle = 'rgba(39, 49, 33, .3)';
-      ctx.beginPath(); ctx.ellipse(lakeAltar.x + 4, lakeAltar.y + 20, 98, 43, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#6e7153';
-      ctx.beginPath(); ctx.ellipse(lakeAltar.x, lakeAltar.y + 10, 89, 39, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#b2a778';
-      ctx.beginPath(); ctx.ellipse(lakeAltar.x, lakeAltar.y, 78, 31, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#6d7054';
-      ctx.beginPath(); ctx.moveTo(x - 31, y - 2); ctx.lineTo(x - 24, y - 38); ctx.lineTo(x - 11, y - 50); ctx.lineTo(x + 13, y - 48); ctx.lineTo(x + 31, y - 31); ctx.lineTo(x + 26, y + 1); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#9b9b75';
-      ctx.beginPath(); ctx.moveTo(x - 21, y - 3); ctx.lineTo(x - 17, y - 34); ctx.lineTo(x - 7, y - 42); ctx.lineTo(x + 8, y - 40); ctx.lineTo(x + 20, y - 28); ctx.lineTo(x + 17, y - 2); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = 'rgba(244, 230, 181, .8)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x, y - 34); ctx.lineTo(x - 7, y - 22); ctx.lineTo(x + 3, y - 14); ctx.lineTo(x - 2, y - 4); ctx.stroke();
+      ctx.strokeStyle = 'rgba(77, 68, 46, .42)'; ctx.lineWidth = 36; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x - radiusX + 8, y + 8); ctx.lineTo(moonstoneEntrance.x, moonstoneEntrance.y); ctx.stroke();
+      ctx.strokeStyle = 'rgba(203, 186, 128, .82)'; ctx.lineWidth = 25;
+      ctx.beginPath(); ctx.moveTo(x - radiusX + 8, y + 8); ctx.lineTo(moonstoneEntrance.x, moonstoneEntrance.y); ctx.stroke();
+      ctx.fillStyle = 'rgba(39, 49, 33, .36)';
+      ctx.fillRect(x - 147, y - 53, 24, 111);
+      ctx.fillRect(x - 82, y - 53, 24, 111);
+      ctx.fillRect(x - 151, y - 58, 81, 19);
+      ctx.fillStyle = '#78775a';
+      ctx.fillRect(x - 145, y - 49, 17, 100);
+      ctx.fillRect(x - 87, y - 49, 17, 100);
+      ctx.fillRect(x - 148, y - 56, 76, 15);
+      ctx.fillStyle = '#293c3a';
+      ctx.fillRect(x - 127, y - 37, 37, 88);
+      ctx.strokeStyle = 'rgba(223, 218, 172, .65)'; ctx.lineWidth = 3;
+      ctx.strokeRect(x - 130, y - 40, 43, 94);
+      ctx.fillStyle = '#f0d98f';
+      ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
+      ctx.fillText('MOONSTONE SANCTUM', x - 108, y - 70);
       if (lakeItemsDelivered) {
-        ctx.fillStyle = 'rgba(245, 220, 143, .75)';
-        ctx.beginPath(); ctx.arc(x, y - 53, 7 + Math.sin(elapsed * 3) * 2, 0, TAU); ctx.fill();
+        ctx.fillStyle = `rgba(197, 232, 224, ${.55 + Math.sin(elapsed * 3) * .18})`;
+        ctx.beginPath(); ctx.arc(x - 108, y + 2, 13, 0, TAU); ctx.fill();
       }
     }
     ctx.fillStyle = 'rgba(43, 61, 37, .82)';
@@ -967,6 +978,92 @@
     ctx.fillStyle = '#fff4cf';
     ctx.beginPath(); ctx.arc(item.x - 2, item.y - 3, 2.5, 0, TAU); ctx.fill();
     ctx.lineCap = 'butt';
+  }
+  function drawMoonstoneInterior() {
+    ctx.fillStyle = '#294944';
+    ctx.fillRect(0, 0, moonstoneWorld.width, moonstoneWorld.height);
+    const glow = ctx.createRadialGradient(450, 365, 25, 450, 365, 510);
+    glow.addColorStop(0, 'rgba(177, 221, 204, .32)');
+    glow.addColorStop(1, 'rgba(18, 38, 40, .42)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, moonstoneWorld.width, moonstoneWorld.height);
+    for (let i = 0; i < 460; i++) {
+      const x = (i * 137 + (i % 9) * 31) % moonstoneWorld.width;
+      const y = (i * 83 + (i % 13) * 29) % moonstoneWorld.height;
+      ctx.fillStyle = i % 4 ? 'rgba(185, 218, 196, .16)' : 'rgba(230, 211, 146, .2)';
+      ctx.fillRect(x, y, 2, 3);
+    }
+
+    ctx.fillStyle = 'rgba(13, 30, 31, .4)';
+    ctx.beginPath(); ctx.ellipse(450, 407, 326, 273, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#62786c';
+    ctx.beginPath(); ctx.ellipse(450, 389, 311, 261, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#82927a';
+    ctx.beginPath(); ctx.ellipse(450, 379, 273, 225, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(211, 220, 180, .62)'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(450, 379, 284, 236, 0, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(49, 71, 61, .38)'; ctx.lineWidth = 2;
+    for (let row = 0; row < 8; row++) {
+      const py = 225 + row * 43;
+      ctx.beginPath(); ctx.moveTo(222, py); ctx.quadraticCurveTo(450, py + (row % 2 ? 8 : -8), 678, py); ctx.stroke();
+    }
+
+    const standingStones = [[450, 148], [625, 213], [700, 390], [620, 560], [450, 610], [280, 560], [200, 390], [275, 215]];
+    for (let i = 0; i < standingStones.length; i++) {
+      const [x, y] = standingStones[i];
+      ctx.fillStyle = 'rgba(25, 39, 36, .34)';
+      ctx.beginPath(); ctx.ellipse(x + 5, y + 6, 25, 13, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = i % 2 ? '#697b6d' : '#788373';
+      ctx.beginPath(); ctx.moveTo(x - 20, y); ctx.lineTo(x - 15, y - 64); ctx.lineTo(x - 4, y - 75);
+      ctx.lineTo(x + 17, y - 67); ctx.lineTo(x + 21, y); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(194, 210, 178, .4)';
+      ctx.beginPath(); ctx.moveTo(x - 11, y - 8); ctx.lineTo(x - 9, y - 58); ctx.lineTo(x + 4, y - 54); ctx.lineTo(x + 7, y - 8); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(220, 223, 184, .52)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x, y - 22); ctx.lineTo(x - 5, y - 39); ctx.lineTo(x + 2, y - 54); ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(17, 35, 36, .38)';
+    ctx.beginPath(); ctx.ellipse(moonstoneAltar.x + 5, moonstoneAltar.y + 22, 111, 58, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#5c6e66';
+    ctx.beginPath(); ctx.ellipse(moonstoneAltar.x, moonstoneAltar.y + 12, 104, 51, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#a2a58a';
+    ctx.beginPath(); ctx.ellipse(moonstoneAltar.x, moonstoneAltar.y, 91, 43, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#68776c';
+    ctx.beginPath(); ctx.moveTo(397, 406); ctx.lineTo(408, 370); ctx.lineTo(492, 370); ctx.lineTo(503, 406); ctx.lineTo(493, 438); ctx.lineTo(407, 438); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a6aa8e';
+    ctx.beginPath(); ctx.moveTo(407, 402); ctx.lineTo(417, 379); ctx.lineTo(483, 379); ctx.lineTo(493, 402); ctx.lineTo(486, 428); ctx.lineTo(414, 428); ctx.closePath(); ctx.fill();
+    const altarGlow = ctx.createRadialGradient(450, 383, 3, 450, 383, lakeItemsDelivered ? 110 : 62);
+    altarGlow.addColorStop(0, lakeItemsDelivered ? 'rgba(201, 245, 239, .86)' : 'rgba(180, 218, 207, .5)');
+    altarGlow.addColorStop(1, 'rgba(166, 229, 220, 0)');
+    ctx.fillStyle = altarGlow; ctx.beginPath(); ctx.arc(450, 383, lakeItemsDelivered ? 110 : 62, 0, TAU); ctx.fill();
+    ctx.fillStyle = lakeItemsDelivered ? '#e5f5df' : '#b9d8c6';
+    ctx.beginPath(); ctx.moveTo(450, 347); ctx.lineTo(468, 373); ctx.lineTo(460, 399); ctx.lineTo(440, 399); ctx.lineTo(432, 373); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(245, 255, 229, .86)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(450, 354); ctx.lineTo(445, 373); ctx.lineTo(455, 383); ctx.stroke();
+    if (lakeItemsDelivered) {
+      for (let i = 0; i < lakeItems.length; i++) {
+        const angle = elapsed * .18 + i * TAU / lakeItems.length;
+        const itemX = 450 + Math.cos(angle) * 34;
+        const itemY = 388 + Math.sin(angle) * 13;
+        ctx.fillStyle = lakeItems[i].color;
+        ctx.beginPath(); ctx.arc(itemX, itemY, 5, 0, TAU); ctx.fill();
+      }
+    }
+
+    ctx.fillStyle = '#89917a';
+    ctx.fillRect(416, 718, 68, 13);
+    ctx.fillRect(424, 731, 52, 12);
+    ctx.fillStyle = '#4d665c';
+    ctx.fillRect(422, 673, 12, 47);
+    ctx.fillRect(466, 673, 12, 47);
+    ctx.fillRect(419, 665, 62, 13);
+    ctx.fillStyle = '#263f40';
+    ctx.fillRect(435, 681, 30, 38);
+    ctx.strokeStyle = 'rgba(202, 223, 188, .62)'; ctx.lineWidth = 2;
+    ctx.strokeRect(432, 678, 36, 44);
+    ctx.fillStyle = 'rgba(31, 48, 41, .86)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('MOONSTONE SANCTUM', 450, 615);
   }
   function drawMeadowBloom(bloom) {
     if (bloom.taken) return;
@@ -1445,6 +1542,7 @@
   function blocked(x, y) {
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
     if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
+    if (scene === 'moonstoneIsle') return x < 40 || y < 40 || x > moonstoneWorld.width - 40 || y > moonstoneWorld.height - 30;
     if (scene === 'lake') {
       if (x < 24 || y < 24 || x > lakeWorld.width - 24 || y > lakeWorld.height - 24) return true;
       const water = onLakeWater(x, y) || onLakeStream(x, y);
@@ -1479,6 +1577,18 @@
     return false;
   }
   function interactable() {
+    if (scene === 'moonstoneIsle') {
+      const targets = [
+        { type: 'moonstoneAltar', item: moonstoneAltar, range: 72 },
+        { type: 'moonstoneExit', item: moonstoneExit, range: 62 }
+      ];
+      let nearest = null, nearestDistance = Infinity;
+      for (const target of targets) {
+        const d = distance(player, target.item);
+        if (d < nearestDistance && d < target.range) { nearest = target; nearestDistance = d; }
+      }
+      return nearest;
+    }
     if (scene === 'stoneCircle') {
       const targets = [
         { type: 'circleAltar', item: stoneCircleAltar, range: 70 },
@@ -1511,7 +1621,7 @@
       const targets = inBoat ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 105 })) : [
         { type: 'lakeExit', item: lakeExit, range: 62 },
         { type: 'lakeBoat', item: lakeBoat, range: 76 },
-        { type: 'lakeAltar', item: lakeAltar, range: 72 }
+        { type: 'moonstoneEntrance', item: moonstoneEntrance, range: 62 }
       ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
@@ -1580,10 +1690,11 @@
     toastTimer = 3.2;
   }
   function updateHud() {
-    const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || scene === 'lake';
-    seedLabel.textContent = scene === 'lake' ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = scene === 'lake' ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? 'Bring the four keepsakes to Moonstone Isle' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    const lakeScene = scene === 'lake' || scene === 'moonstoneIsle';
+    const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || lakeScene;
+    seedLabel.textContent = lakeScene ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
+    areaLabel.textContent = scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    questLabel.textContent = lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on the lake islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -1616,6 +1727,27 @@
   function performInteract() {
     const target = interactable();
     if (!target) return;
+    if (scene === 'moonstoneIsle') {
+      if (target.type === 'moonstoneExit') {
+        scene = 'lake';
+        player.x = moonstoneReturn.x;
+        player.y = moonstoneReturn.y;
+        player.faceX = -1;
+        player.faceY = 0;
+        moonstoneReturn = null;
+        updateHud();
+        say('You step back through the arch to the Moonstone Isle docks.');
+      } else if (target.type === 'moonstoneAltar') {
+        if (lakeItemsDelivered) say('The four keepsakes shine together on the Moonstone.');
+        else if (!lakeItems.every(item => item.taken)) say('The Moonstone is waiting. Find all four keepsakes on the lake islands first.');
+        else {
+          lakeItemsDelivered = true;
+          updateHud();
+          say('You place the four keepsakes on the Moonstone. A silver light ripples across the lake.');
+        }
+      }
+      return;
+    }
     if (scene === 'stoneCircle') {
       if (target.type === 'circleExit') {
         scene = 'meadow';
@@ -1692,14 +1824,16 @@
         lakeBoat.y = target.item.y;
         updateHud();
         say(`You tie the boat up at ${target.item.name}.`);
-      } else if (target.type === 'lakeAltar') {
-        if (lakeItemsDelivered) say('The four keepsakes shine together on the Moonstone.');
-        else if (!lakeItems.every(item => item.taken)) say('The Moonstone is waiting. Find all four keepsakes on the islands first.');
-        else {
-          lakeItemsDelivered = true;
-          updateHud();
-          say('You place the four keepsakes on the Moonstone. A silver light ripples across the lake.');
-        }
+      } else if (target.type === 'moonstoneEntrance') {
+        moonstoneReturn = { x: player.x, y: player.y };
+        scene = 'moonstoneIsle';
+        player.x = 450;
+        player.y = 650;
+        player.faceX = 0;
+        player.faceY = -1;
+        player.jumpTime = 0;
+        updateHud();
+        say('You pass through the old arch into Moonstone Isle.');
       } else if (target.type === 'lakeExit') {
         inBoat = false;
         scene = 'meadow';
@@ -1810,6 +1944,9 @@
       } else if (scene === 'stoneCircle') {
         player.x = 450;
         player.y = 635;
+      } else if (scene === 'moonstoneIsle') {
+        player.x = 450;
+        player.y = 650;
       } else if (scene === 'meadow') {
         player.x = 155;
         player.y = meadowExit.y;
@@ -1820,7 +1957,7 @@
         player.x = 272;
         player.y = 738;
       }
-      say(scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
+      say(scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'moonstoneIsle' ? 'The sanctum gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
     } else say('A wisp brushes past. Keep your distance or strike back.');
     updateHud();
   }
@@ -1903,7 +2040,9 @@
         lakeEntrance: 'E  Follow the stream to the South Lake',
         lakeBoat: 'E  Board the boat',
         lakeDock: 'E  Dock at the shore',
-        lakeAltar: lakeItemsDelivered ? 'The Moonstone glimmers with keepsakes' : lakeItems.every(item => item.taken) ? 'E  Place the keepsakes on the Moonstone' : 'The Moonstone is waiting for four keepsakes',
+        moonstoneEntrance: 'E  Enter Moonstone Isle',
+        moonstoneAltar: lakeItemsDelivered ? 'The Moonstone glimmers with keepsakes' : lakeItems.every(item => item.taken) ? 'E  Place the keepsakes on the Moonstone' : 'The Moonstone is waiting for four keepsakes',
+        moonstoneExit: 'E  Return to the Moonstone Isle docks',
         circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
         circleInscription: 'E  Read the stone carving',
         circleExit: 'E  Return to the meadow',
@@ -1917,7 +2056,7 @@
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
-    const activeWorld = scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
+    const activeWorld = scene === 'moonstoneIsle' ? moonstoneWorld : scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
     const viewW = width, viewH = height;
     camera.x = activeWorld.width < viewW ? (activeWorld.width - viewW) / 2 : Math.max(0, Math.min(activeWorld.width - viewW, player.x - viewW / 2));
     camera.y = activeWorld.height < viewH ? (activeWorld.height - viewH) / 2 : Math.max(0, Math.min(activeWorld.height - viewH, player.y - viewH / 2));
@@ -1934,6 +2073,9 @@
       const boatY = inBoat ? player.y : lakeBoat.y;
       const boatAngle = inBoat ? Math.atan2(player.faceY, player.faceX) : 0;
       drawLakeBoat(boatX, boatY, boatAngle);
+      drawPlayer();
+    } else if (scene === 'moonstoneIsle') {
+      drawMoonstoneInterior();
       drawPlayer();
     } else if (scene === 'stoneCircle') {
       drawStoneCircleInterior();
