@@ -145,7 +145,8 @@
   const buildingWorld = { width: 700, height: 600 };
   const meadowWorld = { width: world.width, height: world.height };
   const stoneCircleWorld = { width: 900, height: 800 };
-  const lakeWorld = { width: world.width, height: world.height };
+  const lakeWorld = { width: 4600, height: 2200 };
+  const lakeSurface = { x: 2400, y: 1100, radiusX: 1960, radiusY: 980 };
   const moonstoneWorld = { width: 900, height: 800 };
   const keys = new Set();
   const touch = { x: 0, y: 0, actions: new Set() };
@@ -201,32 +202,32 @@
   const meadowLake = { x: 1900, y: 1275 };
   const lakeExit = { x: 90, y: 750 };
   let inBoat = false;
-  const lakeBoat = { x: 850, y: 750 };
-  const moonstoneEntrance = { x: 1925, y: 755 };
+  const lakeBoat = { x: 610, y: 760 };
+  const moonstoneEntrance = { x: 2530, y: 1080 };
   const lakeIslands = [
-    { x: 1390, y: 400, radiusX: 125, radiusY: 82, name: 'Reed Isle' },
-    { x: 1680, y: 1120, radiusX: 130, radiusY: 88, name: 'Willow Isle' },
-    { x: 2500, y: 410, radiusX: 125, radiusY: 82, name: 'Sunstone Isle' },
-    { x: 2710, y: 1070, radiusX: 135, radiusY: 90, name: 'Lily Isle' },
-    { x: 2050, y: 755, radiusX: 205, radiusY: 150, name: 'Moonstone Isle' }
+    { x: 1250, y: 450, radiusX: 115, radiusY: 75, name: 'Reed Isle' },
+    { x: 1960, y: 1770, radiusX: 125, radiusY: 82, name: 'Willow Isle' },
+    { x: 3500, y: 400, radiusX: 115, radiusY: 75, name: 'Sunstone Isle' },
+    { x: 3900, y: 1550, radiusX: 125, radiusY: 84, name: 'Lily Isle' },
+    { x: 2600, y: 1080, radiusX: 210, radiusY: 150, name: 'Moonstone Isle' }
   ];
   const lakeItems = [
-    { x: 1390, y: 400, name: 'the reed-carved compass', color: '#e5cc84', taken: false },
-    { x: 1680, y: 1120, name: 'the willowglass pendant', color: '#a9d6c6', taken: false },
-    { x: 2500, y: 410, name: 'the sunken riverstone', color: '#9dc8dc', taken: false },
-    { x: 2710, y: 1070, name: 'the moonlit lily charm', color: '#e8a4b8', taken: false }
+    { x: 1250, y: 450, name: 'the reed-carved compass', color: '#e5cc84', taken: false },
+    { x: 1960, y: 1770, name: 'the willowglass pendant', color: '#a9d6c6', taken: false },
+    { x: 3500, y: 400, name: 'the sunken riverstone', color: '#9dc8dc', taken: false },
+    { x: 3900, y: 1550, name: 'the moonlit lily charm', color: '#e8a4b8', taken: false }
   ];
   const moonstoneAltar = { x: 450, y: 390 };
   const moonstoneExit = { x: 450, y: 720 };
   let lakeItemsDelivered = false;
   const lakeDocks = [
-    { x: 850, y: 750, landX: 650, landY: 750, width: 380, name: 'the west dock' },
-    { x: 3120, y: 750, landX: 3260, landY: 750, width: 360, name: 'the east dock' },
-    { x: 1200, y: 400, landX: 1310, landY: 400, width: 170, name: 'Reed Isle' },
-    { x: 1500, y: 1120, landX: 1610, landY: 1120, width: 170, name: 'Willow Isle' },
-    { x: 2310, y: 410, landX: 2420, landY: 410, width: 170, name: 'Sunstone Isle' },
-    { x: 2520, y: 1070, landX: 2630, landY: 1070, width: 170, name: 'Lily Isle' },
-    { x: 1760, y: 755, landX: 1900, landY: 755, width: 190, name: 'Moonstone Isle' }
+    { x: 610, y: 760, landX: 470, landY: 760, width: 220, name: 'the west dock' },
+    { x: 4210, y: 1100, landX: 4380, landY: 1100, width: 220, name: 'the east dock' },
+    { x: 1065, y: 450, landX: 1170, landY: 450, width: 150, name: 'Reed Isle' },
+    { x: 1770, y: 1770, landX: 1875, landY: 1770, width: 150, name: 'Willow Isle' },
+    { x: 3315, y: 400, landX: 3420, landY: 400, width: 150, name: 'Sunstone Isle' },
+    { x: 3715, y: 1550, landX: 3820, landY: 1550, width: 150, name: 'Lily Isle' },
+    { x: 2355, y: 1080, landX: 2510, landY: 1080, width: 150, name: 'Moonstone Isle' }
   ];
   const meadowExit = { x: 75, y: 740 };
   const meadowGuide = {
@@ -791,7 +792,7 @@
     }
   }
   function drawLakeArea() {
-    const x = 1990, y = 755;
+    const { x, y, radiusX, radiusY } = lakeSurface;
     ctx.fillStyle = '#78904e';
     ctx.fillRect(0, 0, lakeWorld.width, lakeWorld.height);
     const sunlight = ctx.createLinearGradient(0, 0, lakeWorld.width, lakeWorld.height);
@@ -812,30 +813,30 @@
     ctx.strokeStyle = '#448c86'; ctx.lineWidth = 82;
     ctx.beginPath(); ctx.moveTo(0, 450); ctx.bezierCurveTo(280, 410, 560, 535, 870, 605); ctx.stroke();
     ctx.strokeStyle = '#c2b17b'; ctx.lineWidth = 72;
-    ctx.beginPath(); ctx.moveTo(0, 750); ctx.bezierCurveTo(250, 720, 430, 780, 650, 750); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, 750); ctx.bezierCurveTo(190, 720, 340, 785, 470, 760); ctx.stroke();
     ctx.strokeStyle = 'rgba(245, 225, 167, .3)'; ctx.lineWidth = 2; ctx.stroke();
 
     ctx.fillStyle = 'rgba(34, 57, 48, .3)';
-    ctx.beginPath(); ctx.ellipse(x + 6, y + 18, 1170, 620, -.04, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + 8, y + 18, radiusX + 20, radiusY + 18, -.04, 0, TAU); ctx.fill();
     ctx.fillStyle = '#448c86';
-    ctx.beginPath(); ctx.ellipse(x, y, 1155, 604, -.04, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x, y, radiusX, radiusY, -.04, 0, TAU); ctx.fill();
     ctx.strokeStyle = 'rgba(186, 218, 174, .52)'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.ellipse(x, y, 1136, 587, -.04, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x, y, radiusX - 20, radiusY - 20, -.04, 0, TAU); ctx.stroke();
     ctx.fillStyle = 'rgba(177, 219, 194, .25)';
-    ctx.beginPath(); ctx.ellipse(x + 180, y - 150, 360, 62, -.12, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(x - 240, y + 135, 250, 35, .16, 0, TAU); ctx.fill();
-    for (let i = 0; i < 50; i++) {
-      const rippleX = x - 1030 + i * 42;
-      const rippleY = y + Math.sin(i * 1.4) * 380;
+    ctx.beginPath(); ctx.ellipse(x + 250, y - 250, 500, 85, -.12, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x - 340, y + 190, 330, 48, .16, 0, TAU); ctx.fill();
+    for (let i = 0; i < 64; i++) {
+      const rippleX = x - radiusX + 140 + i * ((radiusX * 2 - 280) / 63);
+      const rippleY = y + Math.sin(i * 1.4) * radiusY * .78;
       ctx.strokeStyle = 'rgba(211, 231, 188, .43)'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 12 + i % 4 * 5, 4, -.12, 0, Math.PI); ctx.stroke();
     }
 
     for (const island of lakeIslands) drawLakeIsland(island);
-    for (let i = 0; i < 58; i++) {
-      const angle = i * TAU / 58;
-      const bankX = x + Math.cos(angle) * (1170 + i % 3 * 6);
-      const bankY = y + Math.sin(angle) * (620 + i % 3 * 6);
+    for (let i = 0; i < 72; i++) {
+      const angle = i * TAU / 72;
+      const bankX = x + Math.cos(angle) * (radiusX + 20 + i % 3 * 6);
+      const bankY = y + Math.sin(angle) * (radiusY + 20 + i % 3 * 6);
       ctx.fillStyle = i % 3 ? '#68854c' : '#829456';
       ctx.beginPath(); ctx.ellipse(bankX, bankY, 24, 10, angle, 0, TAU); ctx.fill();
       if (i % 3 === 0) {
@@ -846,17 +847,17 @@
     for (const dock of lakeDocks) drawLakeDock(dock);
     ctx.fillStyle = 'rgba(43, 61, 37, .88)';
     ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('WEST DOCK · BOAT TO THE FAR SHORE', 650, 650);
-    ctx.fillText('EAST DOCK · RETURN ACROSS THE LAKE', 3090, 650);
-    for (const [rockX, rockY, radius] of [[1150, 320, 22], [1350, 1120, 18], [2280, 285, 24], [2640, 1090, 20], [2010, 1330, 15], [1680, 420, 14]]) {
+    ctx.fillText('WEST DOCK · BOARD THE BOAT', 500, 680);
+    ctx.fillText('EAST DOCK · RETURN ACROSS THE LAKE', 4200, 980);
+    for (const [rockX, rockY, radius] of [[1660, 850, 22], [1540, 1430, 18], [3120, 270, 24], [4140, 1270, 20], [2490, 1890, 15], [2980, 710, 14]]) {
       drawStone({ x: rockX, y: rockY, r: radius, light: .7 });
     }
     ctx.fillStyle = '#49382a';
-    roundedRect(1570, 250, 260, 46, 5); ctx.fill();
+    roundedRect(2140, 145, 260, 46, 5); ctx.fill();
     ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#f0d98f';
     ctx.font = '15px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('SOUTH LAKE', 1700, 279);
+    ctx.fillText('SOUTH LAKE', 2270, 174);
     ctx.fillStyle = 'rgba(43, 61, 37, .88)';
     ctx.font = '11px "DM Mono", monospace';
     ctx.fillText('THE FOREST RIVER FLOWS IN FROM THE WEST', 410, 555);
@@ -925,22 +926,22 @@
     const startX = dock.x - dock.width / 2;
     const endX = dock.x + dock.width / 2;
     ctx.fillStyle = '#654a32';
-    ctx.fillRect(startX, dock.y - 44, endX - startX, 88);
+    ctx.fillRect(startX, dock.y - 30, endX - startX, 60);
     ctx.fillStyle = '#9b754a';
-    ctx.fillRect(startX + 5, dock.y - 39, endX - startX - 10, 78);
+    ctx.fillRect(startX + 5, dock.y - 25, endX - startX - 10, 50);
     for (let plankX = startX + 12; plankX < endX - 5; plankX += 25) {
       ctx.fillStyle = (plankX - startX) % 2 ? '#a98253' : '#b28a58';
-      ctx.fillRect(plankX, dock.y - 35, 19, 70);
+      ctx.fillRect(plankX, dock.y - 22, 19, 44);
       ctx.strokeStyle = 'rgba(65, 48, 34, .55)'; ctx.lineWidth = 1;
-      ctx.strokeRect(plankX, dock.y - 35, 19, 70);
+      ctx.strokeRect(plankX, dock.y - 22, 19, 44);
     }
     ctx.fillStyle = '#5b452f';
     for (const x of [startX + 8, endX - 16]) {
-      ctx.fillRect(x, dock.y - 54, 8, 108);
+      ctx.fillRect(x, dock.y - 37, 8, 74);
     }
     ctx.fillStyle = '#d3b77a';
-    ctx.fillRect(startX - 5, dock.y - 48, 18, 8);
-    ctx.fillRect(endX - 13, dock.y - 48, 18, 8);
+    ctx.fillRect(startX - 5, dock.y - 31, 18, 8);
+    ctx.fillRect(endX - 13, dock.y - 31, 18, 8);
   }
   function drawLakeBoat(x, y, angle) {
     ctx.save();
@@ -1528,7 +1529,7 @@
     return [];
   }
   function onLakeWater(x, y) {
-    return ((x - 1990) / 1155) ** 2 + ((y - 755) / 604) ** 2 < 1 && !onLakeIsland(x, y);
+    return ((x - lakeSurface.x) / lakeSurface.radiusX) ** 2 + ((y - lakeSurface.y) / lakeSurface.radiusY) ** 2 < 1 && !onLakeIsland(x, y);
   }
   function onLakeIsland(x, y) {
     return lakeIslands.some(island => ((x - island.x) / island.radiusX) ** 2 + ((y - island.y) / island.radiusY) ** 2 < 1);
@@ -1537,7 +1538,7 @@
     return x >= 0 && x < 900 && Math.abs(y - (450 + x * .18)) < 48;
   }
   function onLakeDock(x, y) {
-    return lakeDocks.some(dock => Math.abs(x - dock.x) <= dock.width / 2 && Math.abs(y - dock.y) <= 55);
+    return lakeDocks.some(dock => Math.abs(x - dock.x) <= dock.width / 2 && Math.abs(y - dock.y) <= 35);
   }
   function blocked(x, y) {
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
@@ -1618,7 +1619,7 @@
       return nearest;
     }
     if (scene === 'lake') {
-      const targets = inBoat ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 105 })) : [
+      const targets = inBoat ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 85 })) : [
         { type: 'lakeExit', item: lakeExit, range: 62 },
         { type: 'lakeBoat', item: lakeBoat, range: 76 },
         { type: 'moonstoneEntrance', item: moonstoneEntrance, range: 62 }
