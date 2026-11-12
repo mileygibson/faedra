@@ -145,6 +145,7 @@
   const buildingWorld = { width: 700, height: 600 };
   const meadowWorld = { width: world.width, height: world.height };
   const northWorld = { width: world.width, height: world.height };
+  const northShrineWorld = { width: 900, height: 800 };
   const stoneCircleWorld = { width: 900, height: 800 };
   const lakeWorld = { width: 4600, height: 2200 };
   const lakeSurface = { x: 2400, y: 1100, radiusX: 1960, radiusY: 980 };
@@ -164,6 +165,7 @@
   let currentBuilding = null;
   let buildingReturn = null;
   let northReturn = null;
+  let northAltarReturn = null;
   let meadowReturn = null;
   let meadowCircleReturn = null;
   let lakeReturn = null;
@@ -198,6 +200,13 @@
   const northGate = { x: 410, y: 140 };
   const northExit = { x: 1650, y: 1430 };
   const northAltar = { x: 1650, y: 730 };
+  const northShrineExit = { x: 450, y: 730 };
+  const northShrineAltar = { x: 450, y: 410 };
+  const northInscriptions = [
+    { x: 225, y: 340, text: 'A carved verse reads: “Four lights gathered beneath the northern star restore the sky-road.”' },
+    { x: 675, y: 340, text: 'The second stone shows a comet crossing a ring of distant mountains.' },
+    { x: 450, y: 190, text: 'An old rune reads: “Carry the scattered dawn to the listening stone.”' }
+  ];
   const northRelics = [
     { x: 700, y: 420, name: 'the dawn shard', color: '#b8e4ed', taken: false },
     { x: 1130, y: 1110, name: 'the pineglow shard', color: '#a9d6c6', taken: false },
@@ -205,6 +214,11 @@
     { x: 2750, y: 1060, name: 'the aurora shard', color: '#e8a4b8', taken: false }
   ];
   let northRelicsDelivered = false;
+  const northEnemies = [
+    { x: 970, y: 650, homeX: 970, homeY: 650, phase: .7, health: 2, alive: true, hit: 0 },
+    { x: 1510, y: 1120, homeX: 1510, homeY: 1120, phase: 2.4, health: 2, alive: true, hit: 0 },
+    { x: 2300, y: 760, homeX: 2300, homeY: 760, phase: 4.2, health: 2, alive: true, hit: 0 }
+  ];
   const meadowBlooms = [
     { x: 560, y: 385, name: 'a sunbell', taken: false, color: '#f5d875' },
     { x: 1450, y: 1120, name: 'a blue starflower', taken: false, color: '#9dc8dc' },
@@ -822,6 +836,40 @@
       ctx.beginPath(); ctx.moveTo(x, y - 19); ctx.lineTo(x - 2, y + 3); ctx.lineTo(x + 9, y + 3); ctx.closePath(); ctx.fill();
     }
 
+    for (const [x, y, radiusX, radiusY] of [[370, 900, 88, 39], [2460, 285, 112, 47], [2920, 1240, 126, 54]]) {
+      ctx.fillStyle = 'rgba(25, 45, 44, .3)';
+      ctx.beginPath(); ctx.ellipse(x + 4, y + 9, radiusX + 13, radiusY + 10, -.12, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#62786c';
+      ctx.beginPath(); ctx.ellipse(x, y, radiusX + 7, radiusY + 6, -.12, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#557d7b';
+      ctx.beginPath(); ctx.ellipse(x, y - 2, radiusX, radiusY, -.12, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(203, 229, 211, .42)';
+      ctx.beginPath(); ctx.ellipse(x - 20, y - 8, radiusX * .55, radiusY * .24, -.12, 0, TAU); ctx.fill();
+      for (let sparkle = 0; sparkle < 5; sparkle++) {
+        const px = x + Math.cos(sparkle * TAU / 5 + elapsed * .18) * radiusX * .52;
+        const py = y + Math.sin(sparkle * TAU / 5 + elapsed * .18) * radiusY * .42;
+        ctx.fillStyle = 'rgba(220, 245, 224, .8)';
+        ctx.beginPath(); ctx.arc(px, py, 2, 0, TAU); ctx.fill();
+      }
+    }
+
+    for (const [x, y] of [[400, 470], [930, 850], [1450, 1280], [2350, 940], [2910, 500]]) {
+      for (let flower = 0; flower < 11; flower++) {
+        const angle = flower * 2.4;
+        const flowerX = x + Math.cos(angle) * (14 + flower % 4 * 5);
+        const flowerY = y + Math.sin(angle) * (10 + flower % 3 * 4);
+        ctx.strokeStyle = '#476b55'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(flowerX, flowerY + 4); ctx.lineTo(flowerX + 1, flowerY + 12); ctx.stroke();
+        ctx.fillStyle = ['#d7e5c4', '#b9d8d3', '#d2c4e6'][flower % 3];
+        ctx.beginPath(); ctx.arc(flowerX, flowerY, 4, 0, TAU); ctx.fill();
+        ctx.fillStyle = '#f2e7b0';
+        ctx.beginPath(); ctx.arc(flowerX, flowerY, 1.5, 0, TAU); ctx.fill();
+      }
+    }
+    for (const [x, y, radius] of [[180, 280, 19], [1350, 300, 15], [2940, 330, 21], [3020, 1410, 17], [680, 1300, 20], [2170, 1300, 16]]) {
+      drawStone({ x, y, r: radius, light: .78 });
+    }
+
     ctx.fillStyle = 'rgba(23, 39, 38, .32)';
     ctx.beginPath(); ctx.ellipse(northAltar.x + 5, northAltar.y + 20, 244, 166, 0, 0, TAU); ctx.fill();
     ctx.fillStyle = '#65766b';
@@ -878,6 +926,100 @@
     ctx.fillStyle = 'rgba(30, 47, 42, .9)';
     ctx.font = '9px "DM Mono", monospace';
     ctx.fillText('FOREST', northExit.x, northExit.y - 62);
+  }
+  function drawNorthShrineInterior() {
+    ctx.fillStyle = '#344b4b';
+    ctx.fillRect(0, 0, northShrineWorld.width, northShrineWorld.height);
+    const glow = ctx.createRadialGradient(450, 365, 20, 450, 365, 520);
+    glow.addColorStop(0, 'rgba(177, 224, 211, .3)');
+    glow.addColorStop(1, 'rgba(20, 36, 40, .42)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, northShrineWorld.width, northShrineWorld.height);
+    for (let i = 0; i < 390; i++) {
+      const x = (i * 137 + (i % 9) * 31) % northShrineWorld.width;
+      const y = (i * 83 + (i % 13) * 29) % northShrineWorld.height;
+      ctx.fillStyle = i % 4 ? 'rgba(196, 226, 205, .18)' : 'rgba(219, 211, 159, .2)';
+      ctx.fillRect(x, y, 2, 3);
+    }
+
+    ctx.fillStyle = 'rgba(20, 34, 34, .34)';
+    ctx.beginPath(); ctx.ellipse(450, 401, 334, 280, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#66796d';
+    ctx.beginPath(); ctx.ellipse(450, 388, 318, 264, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#89927b';
+    ctx.beginPath(); ctx.ellipse(450, 380, 278, 226, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(210, 226, 190, .62)'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(450, 380, 290, 237, 0, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(52, 75, 66, .42)'; ctx.lineWidth = 2;
+    for (let row = 0; row < 8; row++) {
+      const y = 225 + row * 42;
+      ctx.beginPath(); ctx.moveTo(220, y); ctx.quadraticCurveTo(450, y + (row % 2 ? 8 : -8), 680, y); ctx.stroke();
+    }
+
+    for (let i = 0; i < northInscriptions.length; i++) {
+      const inscription = northInscriptions[i];
+      ctx.fillStyle = 'rgba(22, 38, 37, .36)';
+      ctx.beginPath(); ctx.ellipse(inscription.x + 4, inscription.y + 13, 45, 22, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = i % 2 ? '#6d7b6e' : '#778373';
+      ctx.beginPath(); ctx.moveTo(inscription.x - 31, inscription.y + 12);
+      ctx.lineTo(inscription.x - 26, inscription.y - 27); ctx.lineTo(inscription.x - 11, inscription.y - 38);
+      ctx.lineTo(inscription.x + 20, inscription.y - 34); ctx.lineTo(inscription.x + 32, inscription.y + 9);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(199, 219, 188, .48)';
+      ctx.beginPath(); ctx.moveTo(inscription.x - 20, inscription.y + 4); ctx.lineTo(inscription.x - 16, inscription.y - 25);
+      ctx.lineTo(inscription.x - 3, inscription.y - 27); ctx.lineTo(inscription.x + 2, inscription.y + 5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#e0e6c6';
+      ctx.font = '17px "DM Mono", monospace'; ctx.textAlign = 'center';
+      ctx.fillText(['ᚾ', 'ᛟ', 'ᚷ'][i], inscription.x, inscription.y - 6);
+      ctx.fillStyle = 'rgba(52, 67, 55, .82)';
+      ctx.font = '9px "DM Mono", monospace';
+      ctx.fillText(`INSCRIPTION ${i + 1}`, inscription.x, inscription.y + 33);
+    }
+
+    ctx.fillStyle = 'rgba(20, 34, 34, .4)';
+    ctx.beginPath(); ctx.ellipse(northShrineAltar.x + 5, northShrineAltar.y + 22, 116, 61, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#67776d';
+    ctx.beginPath(); ctx.ellipse(northShrineAltar.x, northShrineAltar.y + 13, 108, 54, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#b0b59a';
+    ctx.beginPath(); ctx.ellipse(northShrineAltar.x, northShrineAltar.y, 94, 43, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#66766b';
+    ctx.beginPath(); ctx.moveTo(396, 431); ctx.lineTo(410, 387); ctx.lineTo(490, 387);
+    ctx.lineTo(504, 431); ctx.lineTo(492, 458); ctx.lineTo(408, 458); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#a8ad91';
+    ctx.beginPath(); ctx.moveTo(407, 423); ctx.lineTo(418, 395); ctx.lineTo(482, 395);
+    ctx.lineTo(493, 423); ctx.lineTo(485, 449); ctx.lineTo(415, 449); ctx.closePath(); ctx.fill();
+    const altarGlow = ctx.createRadialGradient(northShrineAltar.x, northShrineAltar.y - 10, 2, northShrineAltar.x, northShrineAltar.y - 10, northRelicsDelivered ? 100 : 56);
+    altarGlow.addColorStop(0, northRelicsDelivered ? 'rgba(213, 250, 231, .88)' : 'rgba(177, 224, 211, .46)');
+    altarGlow.addColorStop(1, 'rgba(175, 233, 220, 0)');
+    ctx.fillStyle = altarGlow;
+    ctx.beginPath(); ctx.arc(northShrineAltar.x, northShrineAltar.y - 10, northRelicsDelivered ? 100 : 56, 0, TAU); ctx.fill();
+    ctx.fillStyle = northRelicsDelivered ? '#e5f4d8' : '#c1e4d7';
+    ctx.beginPath(); ctx.moveTo(450, 365); ctx.lineTo(470, 397); ctx.lineTo(460, 425);
+    ctx.lineTo(440, 425); ctx.lineTo(430, 397); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(241, 252, 221, .8)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(450, 372); ctx.lineTo(444, 393); ctx.lineTo(455, 405); ctx.lineTo(448, 419); ctx.stroke();
+    if (northRelicsDelivered) {
+      for (let i = 0; i < northRelics.length; i++) {
+        const angle = elapsed * .2 + i * TAU / northRelics.length;
+        ctx.fillStyle = northRelics[i].color;
+        ctx.beginPath(); ctx.arc(450 + Math.cos(angle) * 31, 404 + Math.sin(angle) * 13, 5, 0, TAU); ctx.fill();
+      }
+    }
+
+    ctx.fillStyle = '#9b9b78';
+    ctx.fillRect(416, 718, 68, 13);
+    ctx.fillRect(424, 731, 52, 12);
+    ctx.fillStyle = '#52685f';
+    ctx.fillRect(420, 678, 12, 42);
+    ctx.fillRect(468, 678, 12, 42);
+    ctx.fillRect(417, 670, 66, 13);
+    ctx.fillStyle = '#243c3c';
+    ctx.fillRect(436, 684, 28, 35);
+    ctx.strokeStyle = 'rgba(209, 229, 200, .68)'; ctx.lineWidth = 2;
+    ctx.strokeRect(432, 680, 36, 42);
+    ctx.fillStyle = 'rgba(36, 56, 48, .9)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('THE NORTHSTAR ALTAR', 450, 632);
   }
   function drawNorthRelic(relic) {
     if (relic.taken) return;
@@ -1687,6 +1829,7 @@
   }
   function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
   function enemiesForScene() {
+    if (scene === 'northGrove') return northEnemies;
     if (scene === 'meadow') return meadowEnemies;
     if (scene === 'forest') return enemies;
     return [];
@@ -1705,6 +1848,7 @@
   }
   function blocked(x, y) {
     if (scene === 'northGrove') return x < 32 || y < 32 || x > northWorld.width - 32 || y > northWorld.height - 32;
+    if (scene === 'northShrine') return x < 40 || y < 40 || x > northShrineWorld.width - 40 || y > northShrineWorld.height - 30;
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
     if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
     if (scene === 'moonstoneIsle') return x < 40 || y < 40 || x > moonstoneWorld.width - 40 || y > moonstoneWorld.height - 30;
@@ -1742,6 +1886,19 @@
     return false;
   }
   function interactable() {
+    if (scene === 'northShrine') {
+      const targets = [
+        { type: 'northShrineAltar', item: northShrineAltar, range: 72 },
+        { type: 'northShrineExit', item: northShrineExit, range: 62 },
+        ...northInscriptions.map(item => ({ type: 'northShrineInscription', item, range: 58 }))
+      ];
+      let nearest = null, nearestDistance = Infinity;
+      for (const target of targets) {
+        const d = distance(player, target.item);
+        if (d < nearestDistance && d < target.range) { nearest = target; nearestDistance = d; }
+      }
+      return nearest;
+    }
     if (scene === 'northGrove') {
       const targets = [
         { type: 'northAltar', item: northAltar, range: 74 },
@@ -1870,12 +2027,12 @@
     toastTimer = 3.2;
   }
   function updateHud() {
-    const northScene = scene === 'northGrove';
+    const northScene = scene === 'northGrove' || scene === 'northShrine';
     const lakeScene = scene === 'lake' || scene === 'moonstoneIsle';
     const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || lakeScene;
     seedLabel.textContent = northScene ? `${northRelics.filter(relic => relic.taken).length} / 4 ${northRelicsDelivered ? '✓' : '◇'}` : lakeScene ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = northScene ? northRelicsDelivered ? 'The Northstar altar is awake' : northRelics.every(relic => relic.taken) ? 'Bring the four aurora shards to the altar' : 'Find four aurora shards' : lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on the lake islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    areaLabel.textContent = scene === 'northShrine' ? 'The Northstar Altar' : northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    questLabel.textContent = northScene ? northRelicsDelivered ? 'The Northstar altar is awake' : northRelics.every(relic => relic.taken) ? scene === 'northShrine' ? 'Place four aurora shards on the altar' : 'Explore the Northstar altar' : scene === 'northShrine' ? 'Read the inscriptions and find four shards' : 'Find four aurora shards' : lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on the lake islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -1908,6 +2065,29 @@
   function performInteract() {
     const target = interactable();
     if (!target) return;
+    if (scene === 'northShrine') {
+      if (target.type === 'northShrineExit') {
+        scene = 'northGrove';
+        player.x = northAltarReturn.x;
+        player.y = northAltarReturn.y;
+        player.faceX = 0;
+        player.faceY = 1;
+        player.jumpTime = 0;
+        northAltarReturn = null;
+        updateHud();
+        say('You step out from beneath the Northstar altar.');
+      } else if (target.type === 'northShrineInscription') say(target.item.text);
+      else if (target.type === 'northShrineAltar') {
+        if (northRelicsDelivered) say('The Northstar altar glows with the four aurora shards.');
+        else if (!northRelics.every(relic => relic.taken)) say('The altar is waiting. Find all four aurora shards first.');
+        else {
+          northRelicsDelivered = true;
+          updateHud();
+          say('You place the four aurora shards on the Northstar altar. Its light scatters through the glade.');
+        }
+      }
+      return;
+    }
     if (scene === 'northGrove') {
       if (target.type === 'northExit') {
         scene = 'forest';
@@ -1919,13 +2099,15 @@
         updateHud();
         say('You return south through the trees to the forest.');
       } else if (target.type === 'northAltar') {
-        if (northRelicsDelivered) say('The Northstar altar glows with the four aurora shards.');
-        else if (!northRelics.every(relic => relic.taken)) say('The altar is waiting. Find all four aurora shards first.');
-        else {
-          northRelicsDelivered = true;
-          updateHud();
-          say('You place the four aurora shards on the Northstar altar. Its light scatters through the glade.');
-        }
+        northAltarReturn = { x: player.x, y: player.y };
+        scene = 'northShrine';
+        player.x = 450;
+        player.y = 640;
+        player.faceX = 0;
+        player.faceY = -1;
+        player.jumpTime = 0;
+        updateHud();
+        say('You enter the Northstar altar. Ancient inscriptions surround its heart.');
       }
       return;
     }
@@ -2166,6 +2348,9 @@
       if (scene === 'shrine') {
         player.x = 350;
         player.y = 610;
+      } else if (scene === 'northShrine') {
+        player.x = 450;
+        player.y = 640;
       } else if (scene === 'stoneCircle') {
         player.x = 450;
         player.y = 635;
@@ -2185,7 +2370,7 @@
         player.x = 272;
         player.y = 738;
       }
-      say(scene === 'northGrove' ? 'The northern glade gently returns you to its entrance.' : scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'moonstoneIsle' ? 'The sanctum gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
+      say(scene === 'northShrine' ? 'The Northstar altar gently returns you to its entrance.' : scene === 'northGrove' ? 'The northern glade gently returns you to its entrance.' : scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'moonstoneIsle' ? 'The sanctum gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
     } else say('A wisp brushes past. Keep your distance or strike back.');
     updateHud();
   }
@@ -2271,7 +2456,10 @@
         sign: 'E  Read the sign',
         shrine: player.collected === 3 ? 'E  Enter the ancient shrine' : 'The old shrine is waiting for three lights',
         northGate: 'E  Enter the Northstar Glade',
-        northAltar: northRelicsDelivered ? 'The Northstar altar glows with four shards' : northRelics.every(relic => relic.taken) ? 'E  Place the shards on the Northstar altar' : 'The altar is waiting for four aurora shards',
+        northAltar: 'E  Explore the Northstar altar',
+        northShrineAltar: northRelicsDelivered ? 'The Northstar altar glows with four shards' : northRelics.every(relic => relic.taken) ? 'E  Place the shards on the altar' : 'The altar is waiting for four aurora shards',
+        northShrineInscription: 'E  Read the stone inscription',
+        northShrineExit: 'E  Return to the glade',
         northExit: 'E  Return to the forest',
         meadowGate: player.collected < 3 ? 'Find all three lost lights to open the meadow gate' : 'E  Follow the eastern lane to the meadow',
         meadowExit: 'E  Return to the village',
@@ -2297,7 +2485,7 @@
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
-    const activeWorld = scene === 'northGrove' ? northWorld : scene === 'moonstoneIsle' ? moonstoneWorld : scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
+    const activeWorld = scene === 'northShrine' ? northShrineWorld : scene === 'northGrove' ? northWorld : scene === 'moonstoneIsle' ? moonstoneWorld : scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
     const viewW = width, viewH = height;
     camera.x = activeWorld.width < viewW ? (activeWorld.width - viewW) / 2 : Math.max(0, Math.min(activeWorld.width - viewW, player.x - viewW / 2));
     camera.y = activeWorld.height < viewH ? (activeWorld.height - viewH) / 2 : Math.max(0, Math.min(activeWorld.height - viewH, player.y - viewH / 2));
@@ -2309,7 +2497,13 @@
     ctx.translate(-camera.x, -camera.y);
     if (scene === 'northGrove') {
       drawNorthArea();
-      for (const relic of northRelics) drawNorthRelic(relic);
+      const actors = northEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      for (const relic of northRelics) actors.push({ y: relic.y, draw: () => drawNorthRelic(relic) });
+      actors.push({ y: player.y, draw: drawPlayer });
+      actors.sort((a, b) => a.y - b.y);
+      for (const actor of actors) actor.draw();
+    } else if (scene === 'northShrine') {
+      drawNorthShrineInterior();
       drawPlayer();
     } else if (scene === 'lake') {
       drawLakeArea();
