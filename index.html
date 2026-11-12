@@ -1700,6 +1700,7 @@
     return lakeDocks.some(dock => Math.abs(x - dock.x) <= dock.width / 2 && Math.abs(y - dock.y) <= 35);
   }
   function blocked(x, y) {
+    if (scene === 'northGrove') return x < 32 || y < 32 || x > northWorld.width - 32 || y > northWorld.height - 32;
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
     if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
     if (scene === 'moonstoneIsle') return x < 40 || y < 40 || x > moonstoneWorld.width - 40 || y > moonstoneWorld.height - 30;
