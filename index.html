@@ -200,9 +200,29 @@
   const lakeExit = { x: 90, y: 750 };
   let inBoat = false;
   const lakeBoat = { x: 850, y: 750 };
+  const lakeIslands = [
+    { x: 1390, y: 400, radiusX: 125, radiusY: 82, name: 'Reed Isle' },
+    { x: 1680, y: 1120, radiusX: 130, radiusY: 88, name: 'Willow Isle' },
+    { x: 2500, y: 410, radiusX: 125, radiusY: 82, name: 'Sunstone Isle' },
+    { x: 2710, y: 1070, radiusX: 135, radiusY: 90, name: 'Lily Isle' },
+    { x: 2050, y: 755, radiusX: 205, radiusY: 150, name: 'Moonstone Isle' }
+  ];
+  const lakeItems = [
+    { x: 1390, y: 400, name: 'the reed-carved compass', color: '#e5cc84', taken: false },
+    { x: 1680, y: 1120, name: 'the willowglass pendant', color: '#a9d6c6', taken: false },
+    { x: 2500, y: 410, name: 'the sunken riverstone', color: '#9dc8dc', taken: false },
+    { x: 2710, y: 1070, name: 'the moonlit lily charm', color: '#e8a4b8', taken: false }
+  ];
+  const lakeAltar = { x: 2050, y: 755 };
+  let lakeItemsDelivered = false;
   const lakeDocks = [
-    { x: 850, y: 750, landX: 650, landY: 750, name: 'the west dock' },
-    { x: 3120, y: 750, landX: 3260, landY: 750, name: 'the east dock' }
+    { x: 850, y: 750, landX: 650, landY: 750, width: 380, name: 'the west dock' },
+    { x: 3120, y: 750, landX: 3260, landY: 750, width: 360, name: 'the east dock' },
+    { x: 1200, y: 400, landX: 1310, landY: 400, width: 170, name: 'Reed Isle' },
+    { x: 1500, y: 1120, landX: 1610, landY: 1120, width: 170, name: 'Willow Isle' },
+    { x: 2310, y: 410, landX: 2420, landY: 410, width: 170, name: 'Sunstone Isle' },
+    { x: 2520, y: 1070, landX: 2630, landY: 1070, width: 170, name: 'Lily Isle' },
+    { x: 1760, y: 755, landX: 1900, landY: 755, width: 190, name: 'Moonstone Isle' }
   ];
   const meadowExit = { x: 75, y: 740 };
   const meadowGuide = {
@@ -807,6 +827,7 @@
       ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 12 + i % 4 * 5, 4, -.12, 0, Math.PI); ctx.stroke();
     }
 
+    for (const island of lakeIslands) drawLakeIsland(island);
     for (let i = 0; i < 58; i++) {
       const angle = i * TAU / 58;
       const bankX = x + Math.cos(angle) * (1170 + i % 3 * 6);
@@ -837,10 +858,61 @@
     ctx.fillText('THE FOREST RIVER FLOWS IN FROM THE WEST', 410, 555);
     ctx.lineCap = 'butt';
   }
+  function drawLakeIsland(island) {
+    const { x, y, radiusX, radiusY } = island;
+    ctx.fillStyle = 'rgba(30, 48, 37, .3)';
+    ctx.beginPath(); ctx.ellipse(x + 5, y + 12, radiusX + 18, radiusY + 13, -.08, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#637e55';
+    ctx.beginPath(); ctx.ellipse(x, y, radiusX + 10, radiusY + 8, -.08, 0, TAU); ctx.fill();
+    ctx.fillStyle = island.name === 'Moonstone Isle' ? '#9a9866' : '#869956';
+    ctx.beginPath(); ctx.ellipse(x, y - 3, radiusX, radiusY, -.08, 0, TAU); ctx.fill();
+    ctx.strokeStyle = island.name === 'Moonstone Isle' ? 'rgba(237, 222, 164, .62)' : 'rgba(207, 212, 145, .38)';
+    ctx.lineWidth = island.name === 'Moonstone Isle' ? 4 : 2;
+    ctx.beginPath(); ctx.ellipse(x, y - 3, radiusX - 8, radiusY - 7, -.08, 0, TAU); ctx.stroke();
+
+    for (let i = 0; i < 7; i++) {
+      const angle = i * TAU / 7;
+      const stoneX = x + Math.cos(angle) * radiusX * .76;
+      const stoneY = y + Math.sin(angle) * radiusY * .69;
+      drawStone({ x: stoneX, y: stoneY, r: 5 + i % 3, light: .65 });
+    }
+    for (let i = 0; i < 9; i++) {
+      const flowerX = x + Math.cos(i * 2.4) * radiusX * .55;
+      const flowerY = y + Math.sin(i * 2.4) * radiusY * .42;
+      ctx.strokeStyle = '#526d3e'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(flowerX, flowerY + 4); ctx.lineTo(flowerX, flowerY + 11); ctx.stroke();
+      ctx.fillStyle = ['#e9d477', '#f0eee0', '#d999a1'][i % 3];
+      ctx.beginPath(); ctx.arc(flowerX, flowerY, 4, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#f5dc8e';
+      ctx.beginPath(); ctx.arc(flowerX, flowerY, 1.5, 0, TAU); ctx.fill();
+    }
+
+    if (island.name === 'Moonstone Isle') {
+      ctx.fillStyle = 'rgba(39, 49, 33, .3)';
+      ctx.beginPath(); ctx.ellipse(lakeAltar.x + 4, lakeAltar.y + 20, 98, 43, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#6e7153';
+      ctx.beginPath(); ctx.ellipse(lakeAltar.x, lakeAltar.y + 10, 89, 39, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#b2a778';
+      ctx.beginPath(); ctx.ellipse(lakeAltar.x, lakeAltar.y, 78, 31, 0, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#6d7054';
+      ctx.beginPath(); ctx.moveTo(x - 31, y - 2); ctx.lineTo(x - 24, y - 38); ctx.lineTo(x - 11, y - 50); ctx.lineTo(x + 13, y - 48); ctx.lineTo(x + 31, y - 31); ctx.lineTo(x + 26, y + 1); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#9b9b75';
+      ctx.beginPath(); ctx.moveTo(x - 21, y - 3); ctx.lineTo(x - 17, y - 34); ctx.lineTo(x - 7, y - 42); ctx.lineTo(x + 8, y - 40); ctx.lineTo(x + 20, y - 28); ctx.lineTo(x + 17, y - 2); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(244, 230, 181, .8)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x, y - 34); ctx.lineTo(x - 7, y - 22); ctx.lineTo(x + 3, y - 14); ctx.lineTo(x - 2, y - 4); ctx.stroke();
+      if (lakeItemsDelivered) {
+        ctx.fillStyle = 'rgba(245, 220, 143, .75)';
+        ctx.beginPath(); ctx.arc(x, y - 53, 7 + Math.sin(elapsed * 3) * 2, 0, TAU); ctx.fill();
+      }
+    }
+    ctx.fillStyle = 'rgba(43, 61, 37, .82)';
+    ctx.font = island.name === 'Moonstone Isle' ? '10px "DM Mono", monospace' : '9px "DM Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(island.name.toUpperCase(), x, y + radiusY + 22);
+  }
   function drawLakeDock(dock) {
-    const westBank = dock === lakeDocks[0];
-    const startX = westBank ? dock.x - 210 : dock.x - 70;
-    const endX = westBank ? dock.x + 95 : dock.x + 185;
+    const startX = dock.x - dock.width / 2;
+    const endX = dock.x + dock.width / 2;
     ctx.fillStyle = '#654a32';
     ctx.fillRect(startX, dock.y - 44, endX - startX, 88);
     ctx.fillStyle = '#9b754a';
@@ -877,6 +949,23 @@
     ctx.strokeStyle = '#60462f'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(-24, -23); ctx.moveTo(10, 5); ctx.lineTo(24, 23); ctx.stroke();
     ctx.restore();
+  }
+  function drawLakeItem(item) {
+    if (item.taken) return;
+    const pulse = .8 + Math.sin(elapsed * 3 + item.x) * .15;
+    const glow = ctx.createRadialGradient(item.x, item.y, 2, item.x, item.y, 35 * pulse);
+    glow.addColorStop(0, item.color + 'aa');
+    glow.addColorStop(1, item.color + '00');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(item.x, item.y, 35 * pulse, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(42, 51, 36, .3)';
+    ctx.beginPath(); ctx.ellipse(item.x + 2, item.y + 8, 13, 6, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = item.color;
+    ctx.beginPath(); ctx.moveTo(item.x, item.y - 12); ctx.lineTo(item.x + 9, item.y - 1);
+    ctx.lineTo(item.x + 6, item.y + 10); ctx.lineTo(item.x - 6, item.y + 10);
+    ctx.lineTo(item.x - 9, item.y - 1); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff4cf';
+    ctx.beginPath(); ctx.arc(item.x - 2, item.y - 3, 2.5, 0, TAU); ctx.fill();
     ctx.lineCap = 'butt';
   }
   function drawMeadowBloom(bloom) {
@@ -1342,13 +1431,16 @@
     return [];
   }
   function onLakeWater(x, y) {
-    return ((x - 1990) / 1155) ** 2 + ((y - 755) / 604) ** 2 < 1;
+    return ((x - 1990) / 1155) ** 2 + ((y - 755) / 604) ** 2 < 1 && !onLakeIsland(x, y);
+  }
+  function onLakeIsland(x, y) {
+    return lakeIslands.some(island => ((x - island.x) / island.radiusX) ** 2 + ((y - island.y) / island.radiusY) ** 2 < 1);
   }
   function onLakeStream(x, y) {
     return x >= 0 && x < 900 && Math.abs(y - (450 + x * .18)) < 48;
   }
   function onLakeDock(x, y) {
-    return y >= 696 && y <= 804 && (x >= 630 && x <= 960 || x >= 3020 && x <= 3270);
+    return lakeDocks.some(dock => Math.abs(x - dock.x) <= dock.width / 2 && Math.abs(y - dock.y) <= 55);
   }
   function blocked(x, y) {
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
@@ -1416,12 +1508,11 @@
       return nearest;
     }
     if (scene === 'lake') {
-      const targets = inBoat
-        ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 105 }))
-        : [
-            { type: 'lakeExit', item: lakeExit, range: 62 },
-            { type: 'lakeBoat', item: lakeBoat, range: 76 }
-          ];
+      const targets = inBoat ? lakeDocks.map(item => ({ type: 'lakeDock', item, range: 105 })) : [
+        { type: 'lakeExit', item: lakeExit, range: 62 },
+        { type: 'lakeBoat', item: lakeBoat, range: 76 },
+        { type: 'lakeAltar', item: lakeAltar, range: 72 }
+      ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
         const d = distance(player, target.item);
@@ -1490,9 +1581,9 @@
   }
   function updateHud() {
     const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || scene === 'lake';
-    seedLabel.textContent = meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
+    seedLabel.textContent = scene === 'lake' ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
     areaLabel.textContent = scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = scene === 'lake' ? inBoat ? 'Row across to the east dock' : 'Board the boat to cross the lake' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    questLabel.textContent = scene === 'lake' ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? 'Bring the four keepsakes to Moonstone Isle' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -1601,6 +1692,14 @@
         lakeBoat.y = target.item.y;
         updateHud();
         say(`You tie the boat up at ${target.item.name}.`);
+      } else if (target.type === 'lakeAltar') {
+        if (lakeItemsDelivered) say('The four keepsakes shine together on the Moonstone.');
+        else if (!lakeItems.every(item => item.taken)) say('The Moonstone is waiting. Find all four keepsakes on the islands first.');
+        else {
+          lakeItemsDelivered = true;
+          updateHud();
+          say('You place the four keepsakes on the Moonstone. A silver light ripples across the lake.');
+        }
       } else if (target.type === 'lakeExit') {
         inBoat = false;
         scene = 'meadow';
@@ -1783,6 +1882,15 @@
         }
       }
     }
+    if (scene === 'lake' && !inBoat) {
+      for (const item of lakeItems) {
+        if (!item.taken && distance(player, item) < 32) {
+          item.taken = true;
+          say(`You found ${item.name}. Bring it to Moonstone Isle.`);
+          updateHud();
+        }
+      }
+    }
     const target = interactable();
     if (target) {
       const hints = {
@@ -1795,7 +1903,7 @@
         lakeEntrance: 'E  Follow the stream to the South Lake',
         lakeBoat: 'E  Board the boat',
         lakeDock: 'E  Dock at the shore',
-        lakeExit: 'E  Return to the meadow',
+        lakeAltar: lakeItemsDelivered ? 'The Moonstone glimmers with keepsakes' : lakeItems.every(item => item.taken) ? 'E  Place the keepsakes on the Moonstone' : 'The Moonstone is waiting for four keepsakes',
         circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
         circleInscription: 'E  Read the stone carving',
         circleExit: 'E  Return to the meadow',
@@ -1821,6 +1929,7 @@
     ctx.translate(-camera.x, -camera.y);
     if (scene === 'lake') {
       drawLakeArea();
+      for (const item of lakeItems) drawLakeItem(item);
       const boatX = inBoat ? player.x : lakeBoat.x;
       const boatY = inBoat ? player.y : lakeBoat.y;
       const boatAngle = inBoat ? Math.atan2(player.faceY, player.faceX) : 0;
