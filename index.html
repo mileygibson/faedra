@@ -148,6 +148,8 @@
   const northShrineWorld = { width: 900, height: 800 };
   const mountainWorld = { width: 2200, height: 1700 };
   const mountainSummitWorld = { width: 900, height: 800 };
+  const ruinsWorld = { width: 1300, height: 1000 };
+  const ruinsInteriorWorld = { width: 900, height: 800 };
   const stoneCircleWorld = { width: 900, height: 800 };
   const lakeWorld = { width: 4600, height: 2200 };
   const lakeSurface = { x: 2400, y: 1100, radiusX: 1960, radiusY: 980 };
@@ -170,6 +172,9 @@
   let northAltarReturn = null;
   let mountainReturn = null;
   let mountainSummitReturn = null;
+  let ruinsReturn = null;
+  let ruinsInteriorReturn = null;
+  let ruinsProgress = 0;
   let meadowReturn = null;
   let meadowCircleReturn = null;
   let lakeReturn = null;
@@ -221,6 +226,18 @@
     { x: 225, y: 350, text: 'A frozen inscription reads: “The mountain keeps what the patient bring together.”' },
     { x: 675, y: 350, text: 'The worn carving depicts five stars circling the highest peak.' },
     { x: 450, y: 190, text: 'A final rune says: “Set the froststones here, and winter will remember the dawn.”' }
+  ];
+  const forestRuinsGate = { x: 80, y: 740 };
+  const ruinsExit = { x: 1200, y: 850 };
+  const ruinsOffering = { x: 650, y: 575 };
+  const ruinsDoor = { x: 650, y: 340 };
+  const ruinsInteriorExit = { x: 450, y: 730 };
+  const ruinsRelics = [
+    { area: 'forest', areaName: 'the forest', x: 760, y: 1180, name: 'the rootbound seal', color: '#b5d58b', taken: false },
+    { area: 'meadow', areaName: 'the meadow', x: 1240, y: 1290, name: 'the sun-carved seal', color: '#efcf80', taken: false },
+    { area: 'lake', areaName: 'the lake', x: 1580, y: 820, name: 'the tideglass seal', color: '#9fd4e0', taken: false },
+    { area: 'northGrove', areaName: 'the Northstar Glade', x: 700, y: 900, name: 'the starforged seal', color: '#cbb1e8', taken: false },
+    { area: 'snowyMountain', areaName: 'the snowy mountain', x: 1600, y: 1300, name: 'the frostbound seal', color: '#d8edf0', taken: false }
   ];
   const mountainRelics = [
     { x: 820, y: 1270, name: 'a snowflake crystal', color: '#bfe8f2', taken: false },
@@ -1278,6 +1295,178 @@
     ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
     ctx.fillText('FROSTSTONE ALTAR', 450, 632);
   }
+  function drawForestRuinsGate() {
+    const { x, y } = forestRuinsGate;
+    ctx.fillStyle = 'rgba(27, 38, 31, .38)';
+    ctx.beginPath(); ctx.ellipse(x, y + 22, 87, 25, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#515b4e';
+    ctx.fillRect(x - 51, y - 38, 24, 92);
+    ctx.fillRect(x + 27, y - 38, 24, 92);
+    ctx.fillStyle = '#78806a';
+    ctx.fillRect(x - 45, y - 33, 13, 82);
+    ctx.fillRect(x + 32, y - 33, 13, 82);
+    ctx.strokeStyle = '#48574b'; ctx.lineWidth = 19;
+    ctx.beginPath(); ctx.moveTo(x - 40, y - 32); ctx.quadraticCurveTo(x, y - 99, x + 40, y - 32); ctx.stroke();
+    ctx.strokeStyle = '#95947a'; ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.moveTo(x - 39, y - 34); ctx.quadraticCurveTo(x, y - 90, x + 39, y - 34); ctx.stroke();
+    ctx.fillStyle = '#39473d';
+    roundedRect(x - 80, y - 113, 160, 30, 5); ctx.fill();
+    ctx.strokeStyle = '#b7b28d'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#e3ddba';
+    ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('ANCIENT RUINS', x, y - 94);
+    ctx.fillStyle = '#80927a';
+    ctx.beginPath(); ctx.arc(x, y - 74, 3, 0, TAU); ctx.fill();
+  }
+  function drawAncientRuins() {
+    ctx.fillStyle = '#777c61';
+    ctx.fillRect(0, 0, ruinsWorld.width, ruinsWorld.height);
+    const light = ctx.createLinearGradient(0, 0, ruinsWorld.width, ruinsWorld.height);
+    light.addColorStop(0, 'rgba(208, 192, 132, .2)');
+    light.addColorStop(.55, 'rgba(126, 135, 95, .04)');
+    light.addColorStop(1, 'rgba(38, 55, 45, .34)');
+    ctx.fillStyle = light; ctx.fillRect(0, 0, ruinsWorld.width, ruinsWorld.height);
+    for (let i = 0; i < 500; i++) {
+      const x = (i * 137 + (i % 9) * 31) % ruinsWorld.width;
+      const y = (i * 83 + (i % 13) * 29) % ruinsWorld.height;
+      ctx.fillStyle = i % 4 ? 'rgba(211, 207, 162, .18)' : 'rgba(42, 59, 43, .2)';
+      ctx.fillRect(x, y, 2 + i % 2, 2);
+    }
+
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(43, 48, 37, .35)'; ctx.lineWidth = 102;
+    ctx.beginPath(); ctx.moveTo(ruinsExit.x, ruinsExit.y); ctx.bezierCurveTo(1010, 825, 970, 690, ruinsOffering.x, ruinsOffering.y + 110); ctx.stroke();
+    ctx.strokeStyle = '#aa9e72'; ctx.lineWidth = 80;
+    ctx.beginPath(); ctx.moveTo(ruinsExit.x, ruinsExit.y); ctx.bezierCurveTo(1010, 825, 970, 690, ruinsOffering.x, ruinsOffering.y + 110); ctx.stroke();
+    ctx.strokeStyle = 'rgba(238, 222, 164, .34)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.lineCap = 'butt';
+
+    for (const [x, y, r] of [[145, 245, 24], [290, 330, 19], [1050, 265, 26], [1160, 460, 21], [1080, 710, 28], [245, 750, 27], [920, 180, 19]]) {
+      drawStone({ x, y, r, light: .72 });
+      ctx.strokeStyle = 'rgba(45, 59, 43, .55)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x - r * .25, y - r * .35); ctx.lineTo(x + r * .1, y); ctx.lineTo(x - r * .12, y + r * .38); ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(28, 37, 32, .36)';
+    ctx.beginPath(); ctx.ellipse(650, 420, 325, 210, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#565d4e';
+    ctx.fillRect(354, 205, 62, 265); ctx.fillRect(885, 205, 62, 265);
+    ctx.fillRect(404, 180, 498, 64);
+    ctx.fillStyle = '#85856b';
+    ctx.fillRect(365, 212, 39, 248); ctx.fillRect(897, 212, 38, 248);
+    ctx.fillRect(420, 194, 465, 34);
+    ctx.fillStyle = '#626552';
+    ctx.fillRect(425, 244, 456, 228);
+    ctx.fillStyle = '#343f39';
+    ctx.fillRect(492, 265, 322, 205);
+    ctx.strokeStyle = 'rgba(192, 183, 132, .72)'; ctx.lineWidth = 4;
+    ctx.strokeRect(473, 246, 360, 232);
+    ctx.strokeStyle = '#b8af81'; ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      const runeX = 535 + i * 58;
+      ctx.beginPath(); ctx.moveTo(runeX, 300); ctx.lineTo(runeX + 8, 320); ctx.lineTo(runeX - 3, 341); ctx.lineTo(runeX + 7, 361); ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(34, 43, 33, .38)';
+    ctx.beginPath(); ctx.ellipse(ruinsOffering.x + 5, ruinsOffering.y + 20, 136, 74, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#656850';
+    ctx.beginPath(); ctx.ellipse(ruinsOffering.x, ruinsOffering.y + 13, 127, 65, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#b5aa7c';
+    ctx.beginPath(); ctx.ellipse(ruinsOffering.x, ruinsOffering.y, 108, 48, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(65, 78, 56, .7)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(ruinsOffering.x, ruinsOffering.y, 83, 34, 0, 0, TAU); ctx.stroke();
+    if (ruinsProgress > 0) {
+      for (let i = 0; i < ruinsProgress; i++) {
+        const angle = -Math.PI / 2 + i * TAU / 5;
+        ctx.fillStyle = ruinsRelics[i].color;
+        ctx.beginPath(); ctx.arc(ruinsOffering.x + Math.cos(angle) * 61, ruinsOffering.y + Math.sin(angle) * 24, 8, 0, TAU); ctx.fill();
+      }
+    }
+    ctx.fillStyle = 'rgba(43, 55, 39, .9)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('OFFERING STONE', ruinsOffering.x, ruinsOffering.y + 87);
+    ctx.fillStyle = '#786f55';
+    ctx.fillRect(ruinsDoor.x - 104, ruinsDoor.y - 60, 35, 182);
+    ctx.fillRect(ruinsDoor.x + 69, ruinsDoor.y - 60, 35, 182);
+    ctx.fillRect(ruinsDoor.x - 120, ruinsDoor.y - 77, 240, 32);
+    ctx.fillStyle = '#9b9272';
+    ctx.fillRect(ruinsDoor.x - 94, ruinsDoor.y - 49, 18, 159);
+    ctx.fillRect(ruinsDoor.x + 76, ruinsDoor.y - 49, 18, 159);
+    ctx.fillRect(ruinsDoor.x - 109, ruinsDoor.y - 69, 218, 16);
+    ctx.fillStyle = '#343f39';
+    ctx.fillRect(ruinsDoor.x - 65, ruinsDoor.y - 34, 130, 142);
+    ctx.strokeStyle = 'rgba(195, 183, 131, .75)'; ctx.lineWidth = 3;
+    ctx.strokeRect(ruinsDoor.x - 69, ruinsDoor.y - 38, 138, 150);
+    ctx.fillStyle = '#c9bf8e';
+    ctx.font = '9px "DM Mono", monospace';
+    ctx.fillText(ruinsProgress >= ruinsRelics.length ? 'THE WAY IS OPEN' : `${ruinsProgress} / 5 SEALS`, ruinsDoor.x, ruinsDoor.y - 94);
+
+    ctx.fillStyle = '#6f704f';
+    ctx.fillRect(ruinsExit.x - 43, ruinsExit.y - 36, 14, 78);
+    ctx.fillRect(ruinsExit.x + 29, ruinsExit.y - 36, 14, 78);
+    ctx.fillStyle = '#b6a879';
+    ctx.fillRect(ruinsExit.x - 50, ruinsExit.y - 44, 100, 13);
+    ctx.fillStyle = 'rgba(36, 48, 37, .9)';
+    ctx.font = '9px "DM Mono", monospace';
+    ctx.fillText('FOREST', ruinsExit.x, ruinsExit.y - 63);
+  }
+  function drawRuinsInterior() {
+    ctx.fillStyle = '#353e37';
+    ctx.fillRect(0, 0, ruinsInteriorWorld.width, ruinsInteriorWorld.height);
+    const glow = ctx.createRadialGradient(450, 340, 20, 450, 340, 520);
+    glow.addColorStop(0, 'rgba(205, 185, 125, .32)');
+    glow.addColorStop(1, 'rgba(17, 27, 25, .6)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, ruinsInteriorWorld.width, ruinsInteriorWorld.height);
+    for (let i = 0; i < 360; i++) {
+      const x = (i * 139 + (i % 9) * 31) % ruinsInteriorWorld.width;
+      const y = (i * 89 + (i % 13) * 29) % ruinsInteriorWorld.height;
+      ctx.fillStyle = i % 3 ? 'rgba(206, 192, 143, .16)' : 'rgba(127, 165, 133, .2)';
+      ctx.fillRect(x, y, 2, 3);
+    }
+    ctx.fillStyle = '#635f4b';
+    ctx.beginPath(); ctx.ellipse(450, 385, 320, 255, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#817a5e';
+    ctx.beginPath(); ctx.ellipse(450, 380, 280, 220, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(211, 197, 149, .62)'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.ellipse(450, 380, 294, 232, 0, 0, TAU); ctx.stroke();
+    for (let i = 0; i < 8; i++) {
+      const angle = i * TAU / 8;
+      const x = 450 + Math.cos(angle) * 246;
+      const y = 380 + Math.sin(angle) * 183;
+      ctx.fillStyle = '#555b4a';
+      ctx.fillRect(x - 15, y - 30, 30, 60);
+      ctx.fillStyle = '#9a906b';
+      ctx.fillRect(x - 19, y - 34, 38, 9);
+      ctx.fillRect(x - 19, y + 25, 38, 9);
+      ctx.strokeStyle = 'rgba(213, 200, 154, .7)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x - 4, y - 17); ctx.lineTo(x + 3, y - 5); ctx.lineTo(x - 3, y + 7); ctx.lineTo(x + 5, y + 19); ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(23, 33, 29, .42)';
+    ctx.beginPath(); ctx.ellipse(450, 380, 108, 62, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#9e956f';
+    ctx.beginPath(); ctx.ellipse(450, 368, 96, 48, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#4d5a4b';
+    ctx.beginPath(); ctx.moveTo(414, 384); ctx.lineTo(425, 343); ctx.lineTo(475, 343);
+    ctx.lineTo(486, 384); ctx.lineTo(475, 410); ctx.lineTo(425, 410); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#d1c28c';
+    ctx.beginPath(); ctx.arc(450, 360, 19, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#ebdfa9';
+    ctx.beginPath(); ctx.arc(450, 360, 10, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#b3a779';
+    ctx.fillRect(416, 718, 68, 13);
+    ctx.fillRect(424, 731, 52, 12);
+    ctx.fillStyle = '#5c634f';
+    ctx.fillRect(420, 678, 12, 42);
+    ctx.fillRect(468, 678, 12, 42);
+    ctx.fillRect(417, 670, 66, 13);
+    ctx.fillStyle = '#26352f';
+    ctx.fillRect(436, 684, 28, 35);
+    ctx.strokeStyle = 'rgba(212, 199, 157, .68)'; ctx.lineWidth = 2;
+    ctx.strokeRect(432, 680, 36, 42);
+    ctx.fillStyle = 'rgba(211, 199, 157, .88)';
+    ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('HEART OF THE RUINS', 450, 620);
+  }
   function drawNorthRelic(relic) {
     if (relic.taken) return;
     const pulse = .8 + Math.sin(elapsed * 3 + relic.x) * .15;
@@ -2091,6 +2280,11 @@
     if (scene === 'forest') return enemies;
     return [];
   }
+  function activeRuinsRelic(area) {
+    if (!mountainRelicsDelivered) return null;
+    const relic = ruinsRelics[ruinsProgress];
+    return relic && relic.area === area && !relic.taken ? relic : null;
+  }
   function onLakeWater(x, y) {
     return ((x - lakeSurface.x) / lakeSurface.radiusX) ** 2 + ((y - lakeSurface.y) / lakeSurface.radiusY) ** 2 < 1 && !onLakeIsland(x, y);
   }
@@ -2108,6 +2302,8 @@
     if (scene === 'northShrine') return x < 40 || y < 40 || x > northShrineWorld.width - 40 || y > northShrineWorld.height - 30;
     if (scene === 'snowyMountain') return x < 32 || y < 32 || x > mountainWorld.width - 32 || y > mountainWorld.height - 32;
     if (scene === 'mountainSummit') return x < 40 || y < 40 || x > mountainSummitWorld.width - 40 || y > mountainSummitWorld.height - 30;
+    if (scene === 'ruins') return x < 32 || y < 32 || x > ruinsWorld.width - 32 || y > ruinsWorld.height - 32;
+    if (scene === 'ruinsInterior') return x < 40 || y < 40 || x > ruinsInteriorWorld.width - 40 || y > ruinsInteriorWorld.height - 30;
     if (scene === 'meadow') return x < 32 || y < 32 || x > meadowWorld.width - 32 || y > meadowWorld.height - 32;
     if (scene === 'stoneCircle') return x < 40 || y < 40 || x > stoneCircleWorld.width - 40 || y > stoneCircleWorld.height - 30;
     if (scene === 'moonstoneIsle') return x < 40 || y < 40 || x > moonstoneWorld.width - 40 || y > moonstoneWorld.height - 30;
@@ -2145,6 +2341,22 @@
     return false;
   }
   function interactable() {
+    if (scene === 'ruins') {
+      const targets = [
+        { type: 'ruinsOffering', item: ruinsOffering, range: 74 },
+        { type: 'ruinsDoor', item: ruinsDoor, range: 74 },
+        { type: 'ruinsExit', item: ruinsExit, range: 66 }
+      ];
+      let nearest = null, nearestDistance = Infinity;
+      for (const target of targets) {
+        const d = distance(player, target.item);
+        if (d < nearestDistance && d < target.range) { nearest = target; nearestDistance = d; }
+      }
+      return nearest;
+    }
+    if (scene === 'ruinsInterior') {
+      return distance(player, ruinsInteriorExit) < 64 ? { type: 'ruinsInteriorExit', item: ruinsInteriorExit } : null;
+    }
     if (scene === 'mountainSummit') {
       const targets = [
         { type: 'mountainSummitAltar', item: mountainSummitAltar, range: 72 },
@@ -2306,6 +2518,10 @@
     if (northDistance < nearestDistance && northDistance < 68) nearest = { type: 'northGate', item: northGate };
     const shrineDistance = distance(player, shrine);
     if (shrineDistance < nearestDistance && shrineDistance < 96) nearest = { type: 'shrine', item: shrine };
+    if (mountainRelicsDelivered) {
+      const ruinsDistance = distance(player, forestRuinsGate);
+      if (ruinsDistance < nearestDistance && ruinsDistance < 80) nearest = { type: 'ruinsEntrance', item: forestRuinsGate };
+    }
     return nearest;
   }
   function say(message) {
@@ -2316,11 +2532,23 @@
   function updateHud() {
     const northScene = scene === 'northGrove' || scene === 'northShrine';
     const mountainScene = scene === 'snowyMountain' || scene === 'mountainSummit';
+    const ruinsScene = scene === 'ruins' || scene === 'ruinsInterior';
+    const ruinsQuestActive = mountainRelicsDelivered && ruinsProgress < ruinsRelics.length;
     const lakeScene = scene === 'lake' || scene === 'moonstoneIsle';
     const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || lakeScene;
     seedLabel.textContent = mountainScene ? `${mountainRelics.filter(relic => relic.taken).length} / 5 ${mountainRelicsDelivered ? '✓' : '◇'}` : northScene ? `${northRelics.filter(relic => relic.taken).length} / 4 ${northRelicsDelivered ? '✓' : '◇'}` : lakeScene ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = scene === 'mountainSummit' ? 'The Mountain Summit' : mountainScene ? 'The Snowy Mountain' : scene === 'northShrine' ? 'The Northstar Altar' : northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    areaLabel.textContent = scene === 'ruinsInterior' ? 'Inside the Ancient Ruins' : scene === 'ruins' ? 'The Ancient Ruins' : scene === 'mountainSummit' ? 'The Mountain Summit' : mountainScene ? 'The Snowy Mountain' : scene === 'northShrine' ? 'The Northstar Altar' : northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
     questLabel.textContent = mountainScene ? mountainRelicsDelivered ? 'The mountain summit glows' : mountainRelics.every(relic => relic.taken) ? scene === 'mountainSummit' ? 'Place the five froststones on the altar' : 'Explore the summit altar' : scene === 'mountainSummit' ? 'Read the inscriptions and find five froststones' : 'Find five froststones' : northScene ? northRelicsDelivered ? scene === 'northGrove' && !mountainRelicsDelivered ? 'Speak with Eira about the snowy mountain' : 'The Northstar altar is awake' : northRelics.every(relic => relic.taken) ? scene === 'northShrine' ? 'Place four aurora shards on the altar' : 'Explore the Northstar altar' : scene === 'northShrine' ? 'Read the inscriptions and find four shards' : 'Find four aurora shards' : lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on the lake islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    if (ruinsQuestActive) {
+      const relic = ruinsRelics[ruinsProgress];
+      seedLabel.textContent = `${ruinsProgress} / ${ruinsRelics.length} ◇`;
+      questLabel.textContent = scene === 'ruins'
+        ? relic.taken ? `Return ${relic.name} to the offering stone` : `Find ${relic.name} in ${relic.areaName}`
+        : relic.taken ? `Return ${relic.name} to the ancient ruins` : `Find ${relic.name} in ${relic.areaName}`;
+    } else if (ruinsScene) {
+      seedLabel.textContent = `${ruinsRelics.length} / ${ruinsRelics.length} ✓`;
+      questLabel.textContent = scene === 'ruins' ? 'Enter the ancient ruins' : 'Explore the ancient ruins';
+    }
     healthLabel.innerHTML = '';
     for (let i = 0; i < 3; i++) {
       const heart = document.createElement('span');
@@ -2353,6 +2581,55 @@
   function performInteract() {
     const target = interactable();
     if (!target) return;
+    if (scene === 'ruins') {
+      if (target.type === 'ruinsExit') {
+        scene = 'forest';
+        player.x = ruinsReturn.x;
+        player.y = ruinsReturn.y;
+        player.faceX = 1;
+        player.faceY = 0;
+        ruinsReturn = null;
+        updateHud();
+        say('You leave the ancient ruins and return to the forest.');
+      } else if (target.type === 'ruinsOffering') {
+        const relic = ruinsRelics[ruinsProgress];
+        if (!relic) say('The offering stone is quiet. All five ancient seals have been returned.');
+        else if (!relic.taken) say(`The offering stone is waiting for ${relic.name}. Find it in ${relic.areaName}.`);
+        else {
+          ruinsProgress++;
+          updateHud();
+          say(ruinsProgress === ruinsRelics.length
+            ? 'The fifth seal settles into the stone. The ancient ruins are open.'
+            : `You return ${relic.name}. The next seal has appeared in ${ruinsRelics[ruinsProgress].areaName}.`);
+        }
+      } else if (target.type === 'ruinsDoor') {
+        if (ruinsProgress < ruinsRelics.length) say(`The inner door is sealed. Return ${ruinsRelics.length - ruinsProgress} more ${ruinsRelics.length - ruinsProgress === 1 ? 'seal' : 'seals'} to the offering stone.`);
+        else {
+          ruinsInteriorReturn = { x: player.x, y: player.y };
+          scene = 'ruinsInterior';
+          player.x = 450;
+          player.y = 640;
+          player.faceX = 0;
+          player.faceY = -1;
+          player.jumpTime = 0;
+          updateHud();
+          say('The five seals unlock the ancient door. You step inside the ruins.');
+        }
+      }
+      return;
+    }
+    if (scene === 'ruinsInterior') {
+      scene = 'ruins';
+      player.x = ruinsInteriorReturn.x;
+      player.y = ruinsInteriorReturn.y;
+      player.faceX = 0;
+      player.faceY = 1;
+      player.jumpTime = 0;
+      ruinsInteriorReturn = null;
+      updateHud();
+      say('You step back out through the ancient door.');
+      return;
+    }
     if (scene === 'mountainSummit') {
       if (target.type === 'mountainSummitExit') {
         scene = 'snowyMountain';
@@ -2668,6 +2945,24 @@
       say('You pass north through the trees into the Northstar Glade.');
       return;
     }
+    if (target.type === 'ruinsEntrance') {
+      if (!mountainRelicsDelivered) {
+        say('The western ruins path remains hidden beneath the snow and roots.');
+        return;
+      }
+      ruinsReturn = { x: player.x, y: player.y };
+      scene = 'ruins';
+      player.x = ruinsExit.x;
+      player.y = ruinsExit.y;
+      player.faceX = -1;
+      player.faceY = 0;
+      player.jumpTime = 0;
+      updateHud();
+      say(ruinsProgress === ruinsRelics.length
+        ? 'You return to the ancient ruins. The sealed doorway stands open.'
+        : `You reach the ancient ruins. Return ${ruinsRelics[ruinsProgress].name} to the offering stone.`);
+      return;
+    }
     if (target.type === 'meadowGate') {
       if (player.collected < 3) {
         say('The meadow gate is quiet. Find all three lost lights to open the path.');
@@ -2824,6 +3119,12 @@
         }
       }
     }
+    const ruinsRelic = activeRuinsRelic(scene);
+    if (ruinsRelic && (scene !== 'lake' || !inBoat) && distance(player, ruinsRelic) < 34) {
+      ruinsRelic.taken = true;
+      say(`You found ${ruinsRelic.name}. Return it to the offering stone at the ancient ruins.`);
+      updateHud();
+    }
     const target = interactable();
     if (target) {
       const hints = {
@@ -2835,6 +3136,11 @@
         mountainInscription: 'E  Read the stone inscription',
         mountainSummitExit: 'E  Return to the mountain peak',
         mountainExit: 'E  Return to Northstar Glade',
+        ruinsEntrance: 'E  Follow the western path to the ancient ruins',
+        ruinsOffering: ruinsProgress >= ruinsRelics.length ? 'The five seals are returned' : ruinsRelics[ruinsProgress].taken ? `E  Return ${ruinsRelics[ruinsProgress].name}` : `The offering stone awaits ${ruinsRelics[ruinsProgress].name}`,
+        ruinsDoor: ruinsProgress >= ruinsRelics.length ? 'E  Enter the ancient ruins' : 'Return all five seals to open the ancient door',
+        ruinsExit: 'E  Return to the forest',
+        ruinsInteriorExit: 'E  Return outside',
         northGate: lakeItemsDelivered ? 'E  Enter the Northstar Glade' : 'Return all four lake keepsakes to the Moonstone to open the Northstar path',
         northAltar: 'E  Explore the Northstar altar',
         northShrineAltar: northRelicsDelivered ? 'The Northstar altar glows with four shards' : northRelics.every(relic => relic.taken) ? 'E  Place the shards on the altar' : 'The altar is waiting for four aurora shards',
@@ -2867,7 +3173,7 @@
       hint.classList.add('visible');
     } else hint.classList.remove('visible');
 
-    const activeWorld = scene === 'mountainSummit' ? mountainSummitWorld : scene === 'snowyMountain' ? mountainWorld : scene === 'northShrine' ? northShrineWorld : scene === 'northGrove' ? northWorld : scene === 'moonstoneIsle' ? moonstoneWorld : scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
+    const activeWorld = scene === 'ruinsInterior' ? ruinsInteriorWorld : scene === 'ruins' ? ruinsWorld : scene === 'mountainSummit' ? mountainSummitWorld : scene === 'snowyMountain' ? mountainWorld : scene === 'northShrine' ? northShrineWorld : scene === 'northGrove' ? northWorld : scene === 'moonstoneIsle' ? moonstoneWorld : scene === 'lake' ? lakeWorld : scene === 'stoneCircle' ? stoneCircleWorld : scene === 'meadow' ? meadowWorld : scene === 'shrine' ? shrineWorld : scene === 'building' ? buildingWorld : world;
     const viewW = width, viewH = height;
     camera.x = activeWorld.width < viewW ? (activeWorld.width - viewW) / 2 : Math.max(0, Math.min(activeWorld.width - viewW, player.x - viewW / 2));
     camera.y = activeWorld.height < viewH ? (activeWorld.height - viewH) / 2 : Math.max(0, Math.min(activeWorld.height - viewH, player.y - viewH / 2));
@@ -2877,12 +3183,20 @@
     ctx.clearRect(0, 0, width, height);
     ctx.save();
     ctx.translate(-camera.x, -camera.y);
-    if (scene === 'mountainSummit') {
+    if (scene === 'ruinsInterior') {
+      drawRuinsInterior();
+      drawPlayer();
+    } else if (scene === 'ruins') {
+      drawAncientRuins();
+      drawPlayer();
+    } else if (scene === 'mountainSummit') {
       drawMountainSummitInterior();
       drawPlayer();
     } else if (scene === 'snowyMountain') {
       drawSnowyMountain();
       const actors = mountainRelics.filter(relic => !relic.taken).map(relic => ({ y: relic.y, draw: () => drawNorthRelic(relic) }));
+      const ruinsRelic = activeRuinsRelic('snowyMountain');
+      if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       if (mountainRelicsDelivered) actors.push({ y: ruinsGuide.y, draw: () => drawForestPerson(ruinsGuide) });
       actors.push({ y: player.y, draw: drawPlayer });
       actors.sort((a, b) => a.y - b.y);
@@ -2891,6 +3205,8 @@
       drawNorthArea();
       const actors = northEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
       for (const relic of northRelics) actors.push({ y: relic.y, draw: () => drawNorthRelic(relic) });
+      const ruinsRelic = activeRuinsRelic('northGrove');
+      if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       if (northRelicsDelivered) actors.push({ y: northMountainGuide.y, draw: () => drawForestPerson(northMountainGuide) });
       actors.push({ y: player.y, draw: drawPlayer });
       actors.sort((a, b) => a.y - b.y);
@@ -2901,6 +3217,8 @@
     } else if (scene === 'lake') {
       drawLakeArea();
       for (const item of lakeItems) drawLakeItem(item);
+      const ruinsRelic = activeRuinsRelic('lake');
+      if (ruinsRelic) drawNorthRelic(ruinsRelic);
       const boatX = inBoat ? player.x : lakeBoat.x;
       const boatY = inBoat ? player.y : lakeBoat.y;
       const boatAngle = inBoat ? Math.atan2(player.faceY, player.faceX) : 0;
@@ -2921,6 +3239,8 @@
       drawMeadowGround();
       for (const bloom of meadowBlooms) drawMeadowBloom(bloom);
       const actors = meadowEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      const ruinsRelic = activeRuinsRelic('meadow');
+      if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       actors.push({ y: meadowGuide.y, draw: () => drawForestPerson(meadowGuide) });
       if (meadowDelivered) actors.push({ y: lakeGuide.y, draw: () => drawForestPerson(lakeGuide) });
       actors.push({ y: player.y, draw: drawPlayer });
@@ -2934,7 +3254,10 @@
       for (const stone of stones) drawStone(stone);
       for (const sign of signposts) drawSign(sign);
       for (const light of lights) drawLight(light);
+      drawForestRuinsGate();
       const actors = trees.map(tree => ({ y: tree.y, draw: () => drawTree(tree) }));
+      const ruinsRelic = activeRuinsRelic('forest');
+      if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       if (shrineAwakened) for (const person of forestFolk) actors.push({ y: person.y, draw: () => drawForestPerson(person) });
       for (const person of villageFolk) actors.push({ y: person.y, draw: () => drawForestPerson(person) });
       actors.push({ y: player.y, draw: drawPlayer });
