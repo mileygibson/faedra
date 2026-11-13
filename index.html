@@ -2188,10 +2188,8 @@
       const targets = [
         { type: 'northAltar', item: northAltar, range: 74 },
         { type: 'northExit', item: northExit, range: 64 },
-        ...(northRelicsDelivered ? [
-          { type: 'northMountainGuide', item: northMountainGuide, range: 58 },
-          { type: 'northMountainEntrance', item: northMountainGate, range: 70 }
-        ] : [])
+        ...(northRelicsDelivered ? [{ type: 'northMountainGuide', item: northMountainGuide, range: 58 }] : []),
+        { type: 'northMountainEntrance', item: northMountainGate, range: 70 }
       ];
       let nearest = null, nearestDistance = Infinity;
       for (const target of targets) {
@@ -2452,6 +2450,10 @@
         target.item.spoken = true;
         say(target.item.text);
       } else if (target.type === 'northMountainEntrance') {
+        if (!northRelicsDelivered) {
+          say('The snowy mountain pass is sealed. Return all four aurora shards to the Northstar altar first.');
+          return;
+        }
         mountainReturn = { x: player.x, y: player.y };
         scene = 'snowyMountain';
         player.x = mountainExit.x;
@@ -2651,6 +2653,10 @@
       return;
     }
     if (target.type === 'northGate') {
+      if (!lakeItemsDelivered) {
+        say('The Northstar path is quiet. Return all four keepsakes to the Moonstone in the lake first.');
+        return;
+      }
       northReturn = { x: player.x, y: player.y };
       scene = 'northGrove';
       player.x = northExit.x;
@@ -2829,14 +2835,14 @@
         mountainInscription: 'E  Read the stone inscription',
         mountainSummitExit: 'E  Return to the mountain peak',
         mountainExit: 'E  Return to Northstar Glade',
-        northGate: 'E  Enter the Northstar Glade',
+        northGate: lakeItemsDelivered ? 'E  Enter the Northstar Glade' : 'Return all four lake keepsakes to the Moonstone to open the Northstar path',
         northAltar: 'E  Explore the Northstar altar',
         northShrineAltar: northRelicsDelivered ? 'The Northstar altar glows with four shards' : northRelics.every(relic => relic.taken) ? 'E  Place the shards on the altar' : 'The altar is waiting for four aurora shards',
         northShrineInscription: 'E  Read the stone inscription',
         northShrineExit: 'E  Return to the glade',
         northExit: 'E  Return to the forest',
         northMountainGuide: `E  Talk to ${northMountainGuide.name}`,
-        northMountainEntrance: 'E  Enter the snowy mountain',
+        northMountainEntrance: northRelicsDelivered ? 'E  Enter the snowy mountain' : 'Return all four aurora shards to the Northstar altar to open the mountain pass',
         meadowGate: player.collected < 3 ? 'Find all three lost lights to open the meadow gate' : 'E  Follow the eastern lane to the meadow',
         meadowExit: 'E  Return to the village',
         meadowPerson: `E  Talk to ${meadowGuide.name}`,
