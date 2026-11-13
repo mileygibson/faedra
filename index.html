@@ -2261,6 +2261,23 @@
     ctx.fillRect(-7, 2, 14, 2);
     ctx.fillStyle = '#745637';
     ctx.fillRect(-2, 1, 4, 4);
+    ctx.fillStyle = '#553d32';
+    ctx.beginPath();
+    if (facing === 'down') {
+      ctx.moveTo(-2, -18); ctx.quadraticCurveTo(-7, -23, -5, -28);
+      ctx.lineTo(-1, -33); ctx.quadraticCurveTo(5, -29, 5, -24);
+      ctx.lineTo(3, -18); ctx.closePath();
+    } else if (facing === 'up') {
+      ctx.moveTo(2, -13); ctx.quadraticCurveTo(8, -9, 8, -4);
+      ctx.lineTo(12, 1); ctx.quadraticCurveTo(6, 3, 4, -2);
+      ctx.lineTo(-1, -9); ctx.closePath();
+    } else {
+      const rear = facing === 'left' ? 1 : -1;
+      ctx.moveTo(rear * 4, -18); ctx.quadraticCurveTo(rear * 10, -18, rear * 13, -14);
+      ctx.lineTo(rear * 16, -10); ctx.quadraticCurveTo(rear * 9, -9, rear * 5, -12);
+      ctx.lineTo(rear * 2, -14); ctx.closePath();
+    }
+    ctx.fill();
     ctx.fillStyle = '#d7b487';
     ctx.beginPath(); ctx.ellipse(0, -14, 6, 6, 0, 0, TAU); ctx.fill();
     ctx.fillStyle = '#553d32';
@@ -2286,17 +2303,15 @@
       ctx.fillStyle = '#76513a';
       ctx.beginPath(); ctx.ellipse(0, -10, 5, 3, 0, 0, TAU); ctx.fill();
     }
-    ctx.fillStyle = '#553d32';
+    const ribbon = facing === 'down' ? { x: 2, y: -23 }
+      : facing === 'up' ? { x: 8, y: -8 }
+      : { x: facing === 'left' ? 9 : -9, y: -15 };
+    ctx.fillStyle = '#88a565';
     ctx.beginPath();
-    ctx.moveTo(-5, -19); ctx.quadraticCurveTo(-11, -17, -10, -10);
-    ctx.lineTo(-9, -1); ctx.quadraticCurveTo(-7, 2, -4, -1);
-    ctx.lineTo(-3, -11); ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(5, -19); ctx.quadraticCurveTo(11, -17, 10, -10);
-    ctx.lineTo(9, -1); ctx.quadraticCurveTo(7, 2, 4, -1);
-    ctx.lineTo(3, -11); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#b77b86'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(-10, -4); ctx.lineTo(-6, -6); ctx.moveTo(-10, -4); ctx.lineTo(-7, -1); ctx.stroke();
+    ctx.ellipse(ribbon.x - 3, ribbon.y, 3, 2, -.55, 0, TAU);
+    ctx.ellipse(ribbon.x + 3, ribbon.y, 3, 2, .55, 0, TAU);
+    ctx.arc(ribbon.x, ribbon.y, 1.8, 0, TAU);
+    ctx.fill();
     ctx.strokeStyle = '#745637'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(9, -6); ctx.lineTo(13, -13); ctx.stroke();
     ctx.strokeStyle = '#e5e2ce'; ctx.lineWidth = 2;
