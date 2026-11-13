@@ -270,11 +270,6 @@
     { x: 2750, y: 1060, name: 'the aurora shard', color: '#e8a4b8', taken: false }
   ];
   let northRelicsDelivered = false;
-  const northEnemies = [
-    { x: 970, y: 650, homeX: 970, homeY: 650, phase: .7, health: 2, alive: true, hit: 0 },
-    { x: 1510, y: 1120, homeX: 1510, homeY: 1120, phase: 2.4, health: 2, alive: true, hit: 0 },
-    { x: 2300, y: 760, homeX: 2300, homeY: 760, phase: 4.2, health: 2, alive: true, hit: 0 }
-  ];
   const meadowBlooms = [
     { x: 560, y: 385, name: 'a sunbell', taken: false, color: '#f5d875' },
     { x: 1450, y: 1120, name: 'a blue starflower', taken: false, color: '#9dc8dc' },
@@ -418,10 +413,15 @@
     stones.push({ x, y, r: 3 + random() * 9, light: random() });
   }
   const enemies = [
-    { x: 750, y: 441, homeX: 750, homeY: 441, phase: 0, health: 2, alive: true, hit: 0 },
-    { x: 1190, y: 825, homeX: 1190, homeY: 825, phase: 2.3, health: 2, alive: true, hit: 0 },
-    { x: 1580, y: 1090, homeX: 1580, homeY: 1090, phase: 4.1, health: 2, alive: true, hit: 0 },
-    { x: 1665, y: 536, homeX: 1665, homeY: 536, phase: 1.2, health: 2, alive: true, hit: 0 }
+    { x: 750, y: 441, homeX: 750, homeY: 441, phase: 0, health: 2, alive: true, hit: 0, kind: 'forest' },
+    { x: 1190, y: 825, homeX: 1190, homeY: 825, phase: 2.3, health: 2, alive: true, hit: 0, kind: 'forest' },
+    { x: 1580, y: 1090, homeX: 1580, homeY: 1090, phase: 4.1, health: 2, alive: true, hit: 0, kind: 'forest' },
+    { x: 1665, y: 536, homeX: 1665, homeY: 536, phase: 1.2, health: 2, alive: true, hit: 0, kind: 'forest' }
+  ];
+  const northEnemies = [
+    { x: 970, y: 650, homeX: 970, homeY: 650, phase: .7, health: 2, alive: true, hit: 0, kind: 'north' },
+    { x: 1510, y: 1120, homeX: 1510, homeY: 1120, phase: 2.4, health: 2, alive: true, hit: 0, kind: 'north' },
+    { x: 2300, y: 760, homeX: 2300, homeY: 760, phase: 4.2, health: 2, alive: true, hit: 0, kind: 'north' }
   ];
   const meadowEnemies = [
     { x: 1030, y: 520, homeX: 1030, homeY: 520, phase: .8, health: 2, alive: true, hit: 0, kind: 'meadow' },
@@ -429,6 +429,24 @@
     { x: 2390, y: 610, homeX: 2390, homeY: 610, phase: 4.3, health: 2, alive: true, hit: 0, kind: 'meadow' },
     { x: 760, y: 1230, homeX: 760, homeY: 1230, phase: 1.7, health: 2, alive: true, hit: 0, kind: 'meadow' }
   ];
+  const lakeEnemies = [
+    { x: 1550, y: 780, homeX: 1550, homeY: 780, phase: .5, health: 2, alive: true, hit: 0, kind: 'lake' },
+    { x: 2085, y: 1495, homeX: 2085, homeY: 1495, phase: 2.1, health: 2, alive: true, hit: 0, kind: 'lake' },
+    { x: 3160, y: 650, homeX: 3160, homeY: 650, phase: 3.8, health: 2, alive: true, hit: 0, kind: 'lake' },
+    { x: 3365, y: 1385, homeX: 3365, homeY: 1385, phase: 5.2, health: 2, alive: true, hit: 0, kind: 'lake' }
+  ];
+  const mountainEnemies = [
+    { x: 520, y: 1090, homeX: 520, homeY: 1090, phase: .9, health: 2, alive: true, hit: 0, kind: 'mountain' },
+    { x: 1590, y: 1120, homeX: 1590, homeY: 1120, phase: 2.8, health: 2, alive: true, hit: 0, kind: 'mountain' },
+    { x: 770, y: 490, homeX: 770, homeY: 490, phase: 4.6, health: 2, alive: true, hit: 0, kind: 'mountain' }
+  ];
+  const wispPalettes = {
+    forest: { glow: 'rgba(169, 213, 214, .34)', fade: 'rgba(125, 196, 198, 0)', body: '#b4d8cf', eyes: '#405b4e' },
+    meadow: { glow: 'rgba(241, 210, 135, .4)', fade: 'rgba(221, 175, 96, 0)', body: '#e5d39a', eyes: '#69533a' },
+    lake: { glow: 'rgba(96, 190, 218, .46)', fade: 'rgba(54, 135, 181, 0)', body: '#82d4e5', eyes: '#315b70' },
+    north: { glow: 'rgba(194, 159, 235, .44)', fade: 'rgba(131, 99, 185, 0)', body: '#d2b8f0', eyes: '#56436e' },
+    mountain: { glow: 'rgba(207, 240, 250, .48)', fade: 'rgba(130, 186, 211, 0)', body: '#e2f6fa', eyes: '#456876' }
+  };
 
   function roundedRect(x, y, w, h, r) {
     ctx.beginPath();
@@ -2192,15 +2210,15 @@
     if (!enemy.alive) return;
     const bob = Math.sin(elapsed * 4 + enemy.phase) * 5;
     const x = enemy.x, y = enemy.y + bob;
-    const meadowWisp = enemy.kind === 'meadow';
+    const palette = wispPalettes[enemy.kind];
     const glow = ctx.createRadialGradient(x, y, 2, x, y, 30);
-    glow.addColorStop(0, enemy.hit > 0 ? 'rgba(255, 244, 215, .55)' : meadowWisp ? 'rgba(241, 210, 135, .4)' : 'rgba(169, 213, 214, .34)');
-    glow.addColorStop(1, meadowWisp ? 'rgba(221, 175, 96, 0)' : 'rgba(125, 196, 198, 0)');
+    glow.addColorStop(0, enemy.hit > 0 ? 'rgba(255, 244, 215, .55)' : palette.glow);
+    glow.addColorStop(1, palette.fade);
     ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 30, 0, TAU); ctx.fill();
-    ctx.fillStyle = enemy.hit > 0 ? '#fff1cb' : meadowWisp ? '#e5d39a' : '#b4d8cf';
+    ctx.fillStyle = enemy.hit > 0 ? '#fff1cb' : palette.body;
     ctx.beginPath(); ctx.arc(x, y, 11, Math.PI, 0); ctx.lineTo(x + 11, y + 7);
     ctx.lineTo(x + 5, y + 4); ctx.lineTo(x, y + 9); ctx.lineTo(x - 5, y + 4); ctx.lineTo(x - 11, y + 7); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = meadowWisp ? '#69533a' : '#405b4e';
+    ctx.fillStyle = palette.eyes;
     ctx.beginPath(); ctx.arc(x - 4, y - 1, 1.5, 0, TAU); ctx.arc(x + 4, y - 1, 1.5, 0, TAU); ctx.fill();
     if (enemy.health < 2) {
       ctx.fillStyle = 'rgba(30, 43, 33, .7)'; ctx.fillRect(x - 10, y - 17, 20, 3);
@@ -2323,6 +2341,8 @@
   function enemiesForScene() {
     if (scene === 'northGrove') return northEnemies;
     if (scene === 'meadow') return meadowEnemies;
+    if (scene === 'lake') return lakeEnemies;
+    if (scene === 'snowyMountain') return mountainEnemies;
     if (scene === 'forest') return enemies;
     return [];
   }
@@ -3151,7 +3171,7 @@
       const targetY = enemy.homeY + Math.cos(enemy.phase * .7) * 24;
       enemy.x += (targetX - enemy.x) * dt * .7;
       enemy.y += (targetY - enemy.y) * dt * .7;
-      if (distance(player, enemy) < 24 && player.jump < 10) damage();
+      if (!(scene === 'lake' && inBoat) && distance(player, enemy) < 24 && player.jump < 10) damage();
     }
     if (scene === 'northGrove') {
       for (const relic of northRelics) {
@@ -3266,7 +3286,8 @@
       drawPlayer();
     } else if (scene === 'snowyMountain') {
       drawSnowyMountain();
-      const actors = mountainRelics.filter(relic => !relic.taken).map(relic => ({ y: relic.y, draw: () => drawNorthRelic(relic) }));
+      const actors = mountainEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      for (const relic of mountainRelics) actors.push({ y: relic.y, draw: () => drawNorthRelic(relic) });
       const ruinsRelic = activeRuinsRelic('snowyMountain');
       if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       if (mountainRelicsDelivered) actors.push({ y: ruinsGuide.y, draw: () => drawForestPerson(ruinsGuide) });
@@ -3288,15 +3309,18 @@
       drawPlayer();
     } else if (scene === 'lake') {
       drawLakeArea();
-      for (const item of lakeItems) drawLakeItem(item);
+      const actors = lakeEnemies.filter(enemy => enemy.alive).map(enemy => ({ y: enemy.y, draw: () => drawEnemy(enemy) }));
+      for (const item of lakeItems) actors.push({ y: item.y, draw: () => drawLakeItem(item) });
       const ruinsRelic = activeRuinsRelic('lake');
-      if (ruinsRelic) drawNorthRelic(ruinsRelic);
+      if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
       const boatX = inBoat ? player.x : lakeBoat.x;
       const boatY = inBoat ? player.y : lakeBoat.y;
       const boatAngle = inBoat ? Math.atan2(player.faceY, player.faceX) : 0;
-      drawLakeBoat(boatX, boatY, boatAngle);
-      if (lakeItemsDelivered) drawForestPerson(moonstoneGuide);
-      drawPlayer();
+      actors.push({ y: boatY, draw: () => drawLakeBoat(boatX, boatY, boatAngle) });
+      if (lakeItemsDelivered) actors.push({ y: moonstoneGuide.y, draw: () => drawForestPerson(moonstoneGuide) });
+      actors.push({ y: player.y, draw: drawPlayer });
+      actors.sort((a, b) => a.y - b.y);
+      for (const actor of actors) actor.draw();
     } else if (scene === 'moonstoneIsle') {
       drawMoonstoneInterior();
       drawPlayer();
