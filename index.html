@@ -3300,7 +3300,7 @@
       for (const stone of stones) drawStone(stone);
       for (const sign of signposts) drawSign(sign);
       for (const light of lights) drawLight(light);
-      drawForestRuinsGate();
+      if (mountainRelicsDelivered) drawForestRuinsGate();
       const actors = trees.map(tree => ({ y: tree.y, draw: () => drawTree(tree) }));
       const ruinsRelic = activeRuinsRelic('forest');
       if (ruinsRelic) actors.push({ y: ruinsRelic.y, draw: () => drawNorthRelic(ruinsRelic) });
