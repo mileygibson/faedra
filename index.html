@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#182a20">
-  <meta name="description" content="Explore Hartshollow, the East Meadow, South Lake, and Northstar Glade as Faedra, recover lost lights and relics, and awaken ancient altars.">
+  <meta name="description" content="Explore Hartshollow, Sunbell Meadow, Willowmere Lake, and Northstar Glade as Faedra, recover lost lights and relics, and awaken ancient altars.">
   <title>Faedra: Hartshollow</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
@@ -91,7 +91,7 @@
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="Faedra exploring Hartshollow, the forest, village, East Meadow, South Lake, and Northstar Glade"></canvas>
+  <canvas id="game" aria-label="Faedra exploring Hartshollow, the forest, village, Sunbell Meadow, Willowmere Lake, and Northstar Glade"></canvas>
   <div class="vignette" aria-hidden="true"></div>
   <div class="hud">
     <div class="brand"><div class="brand-mark">F</div><div><div class="brand-name">Faedra</div><div class="brand-sub">Hartshollow</div></div></div>
@@ -243,8 +243,8 @@
   ];
   const ruinsRelics = [
     { area: 'forest', areaName: 'the forest', x: 760, y: 1180, name: 'the rootbound seal', color: '#b5d58b', taken: false },
-    { area: 'meadow', areaName: 'the meadow', x: 1240, y: 1290, name: 'the sun-carved seal', color: '#efcf80', taken: false },
-    { area: 'lake', areaName: 'the lake', x: 1580, y: 820, name: 'the tideglass seal', color: '#9fd4e0', taken: false },
+    { area: 'meadow', areaName: 'Sunbell Meadow', x: 1240, y: 1290, name: 'the sun-carved seal', color: '#efcf80', taken: false },
+    { area: 'lake', areaName: 'Willowmere Lake', x: 1580, y: 820, name: 'the tideglass seal', color: '#9fd4e0', taken: false },
     { area: 'northGrove', areaName: 'the Northstar Glade', x: 700, y: 900, name: 'the starforged seal', color: '#cbb1e8', taken: false },
     { area: 'snowyMountain', areaName: 'the snowy mountain', x: 1600, y: 1300, name: 'the frostbound seal', color: '#d8edf0', taken: false }
   ];
@@ -309,7 +309,7 @@
   const meadowExit = { x: 75, y: 740 };
   const meadowGuide = {
     x: 320, y: 740, name: 'Lark', robe: '#8b9861', hair: '#b57b55', spoken: false,
-    text: 'I’m Lark, keeper of the summer paths. Follow the flower trail east to the old stone circle. Its heartstone is waiting for three meadow blooms.'
+    text: 'I’m Lark, keeper of the summer paths. Follow the flower trail east to the old stone circle. Its heartstone is waiting for three blooms from Sunbell Meadow.'
   };
   const stoneCircleExit = { x: 450, y: 730 };
   const stoneCircleAltar = { x: 450, y: 420 };
@@ -320,7 +320,7 @@
   ];
   const lakeGuide = {
     x: 2550, y: 740, name: 'Neris', robe: '#64828a', hair: '#d1b27b', spoken: false,
-    text: 'The blooms have awakened the heartstone. Head south through the meadow to the lake. Its stream runs west and joins the river you crossed in the forest; perhaps the current has a story of its own.'
+    text: 'The blooms have awakened the heartstone. Follow the stream south through the meadow to Willowmere Lake. It runs west and joins the river you crossed in the forest; perhaps the current has a story of its own.'
   };
   const moonstoneGuide = {
     x: 2470, y: 1000, name: 'Aster', robe: '#627d86', hair: '#d2bd86', spoken: false,
@@ -379,7 +379,7 @@
     hall: {
       resident: { x: 350, y: 350, name: 'Elder Fen', robe: '#81785a', hair: '#c4b58b', spoken: false, text: 'Elder Fen bows. “Hartshollow is yours to wander, Faedra. Its quiet places are opening again.”' },
       props: [
-        { x: 350, y: 230, w: 220, h: 56, kind: 'table', name: 'The council table', text: 'A map marks the river, the shrine, and a meadow beyond the village.' },
+        { x: 350, y: 230, w: 220, h: 56, kind: 'table', name: 'The council table', text: 'A map marks the river, the shrine, and Sunbell Meadow beyond the village.' },
         { x: 220, y: 390, w: 54, h: 38, kind: 'chair', name: 'A chair', text: 'A neatly folded green cloak rests on the seat.' },
         { x: 480, y: 390, w: 54, h: 38, kind: 'chair', name: 'A chair', text: 'The wood is polished smooth by years of meetings.' }
       ]
@@ -715,7 +715,7 @@
     ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#f0d98f';
     ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('EAST MEADOW', x, y - 121);
+    ctx.fillText('SUNBELL MEADOW', x, y - 121);
     ctx.font = '14px "Fraunces", serif';
     ctx.fillText('✦', x, y - 108);
 
@@ -1572,7 +1572,7 @@
     ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#f0d98f';
     ctx.font = '9px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('SOUTH LAKE', x, y - 69);
+    ctx.fillText('WILLOWMERE', x, y - 69);
     for (const reedX of [x - 85, x - 76, x + 76, x + 85]) {
       ctx.strokeStyle = '#526d3e'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(reedX, y + 13); ctx.quadraticCurveTo(reedX - 7, y - 1, reedX + 2, y - 18); ctx.stroke();
@@ -1637,7 +1637,7 @@
     ctx.fillStyle = 'rgba(43, 61, 37, .88)';
     ctx.font = '10px "DM Mono", monospace'; ctx.textAlign = 'center';
     ctx.fillText('WEST DOCK · BOARD THE BOAT', 500, 680);
-    ctx.fillText('EAST DOCK · RETURN ACROSS THE LAKE', 4200, 980);
+    ctx.fillText('EAST DOCK · RETURN ACROSS WILLOWMERE', 4200, 980);
     for (const [rockX, rockY, radius] of [[1660, 850, 22], [1540, 1430, 18], [3120, 270, 24], [4140, 1270, 20], [2490, 1890, 15], [2980, 710, 14]]) {
       drawStone({ x: rockX, y: rockY, r: radius, light: .7 });
     }
@@ -1646,7 +1646,7 @@
     ctx.strokeStyle = '#d6bc7c'; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#f0d98f';
     ctx.font = '15px "DM Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('SOUTH LAKE', 2270, 174);
+    ctx.fillText('WILLOWMERE', 2270, 174);
     ctx.fillStyle = 'rgba(43, 61, 37, .88)';
     ctx.font = '11px "DM Mono", monospace';
     ctx.fillText('THE FOREST RIVER FLOWS IN FROM THE WEST', 410, 555);
@@ -2613,8 +2613,8 @@
     const lakeScene = scene === 'lake' || scene === 'moonstoneIsle';
     const meadowScene = scene === 'meadow' || scene === 'stoneCircle' || lakeScene;
     seedLabel.textContent = mountainScene ? `${mountainRelics.filter(relic => relic.taken).length} / 5 ${mountainRelicsDelivered ? '✓' : '◇'}` : northScene ? `${northRelics.filter(relic => relic.taken).length} / 4 ${northRelicsDelivered ? '✓' : '◇'}` : lakeScene ? `${lakeItems.filter(item => item.taken).length} / 4 ${lakeItemsDelivered ? '✓' : '◇'}` : meadowScene ? `${meadowBlooms.filter(bloom => bloom.taken).length} / 3 ${meadowDelivered ? '✓' : '✿'}` : `${player.collected} / 3 ✦`;
-    areaLabel.textContent = scene === 'ruinsInterior' ? 'Inside the Ancient Ruins' : scene === 'ruins' ? 'The Ancient Ruins' : scene === 'mountainSummit' ? 'The Mountain Summit' : mountainScene ? 'The Snowy Mountain' : scene === 'northShrine' ? 'The Northstar Altar' : northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'The South Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'The East Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
-    questLabel.textContent = mountainScene ? mountainRelicsDelivered ? 'The mountain summit glows' : mountainRelics.every(relic => relic.taken) ? scene === 'mountainSummit' ? 'Place the five froststones on the altar' : 'Explore the summit altar' : scene === 'mountainSummit' ? 'Read the inscriptions and find five froststones' : 'Find five froststones' : northScene ? northRelicsDelivered ? scene === 'northGrove' && !mountainRelicsDelivered ? 'Speak with Eira about the snowy mountain' : 'The Northstar altar is awake' : northRelics.every(relic => relic.taken) ? scene === 'northShrine' ? 'Place four aurora shards on the altar' : 'Explore the Northstar altar' : scene === 'northShrine' ? 'Read the inscriptions and find four shards' : 'Find four aurora shards' : lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on the lake islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek the southern lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to the lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
+    areaLabel.textContent = scene === 'ruinsInterior' ? 'Inside the Ancient Ruins' : scene === 'ruins' ? 'The Ancient Ruins' : scene === 'mountainSummit' ? 'The Mountain Summit' : mountainScene ? 'The Snowy Mountain' : scene === 'northShrine' ? 'The Northstar Altar' : northScene ? 'Northstar Glade' : scene === 'moonstoneIsle' ? 'Moonstone Sanctum' : scene === 'lake' ? 'Willowmere Lake' : scene === 'stoneCircle' ? 'The Meadow Heart' : scene === 'meadow' ? 'Sunbell Meadow' : scene === 'shrine' ? 'The Heartwood Shrine' : scene === 'building' ? currentBuilding.name : 'Forest of Hartshollow';
+    questLabel.textContent = mountainScene ? mountainRelicsDelivered ? 'The mountain summit glows' : mountainRelics.every(relic => relic.taken) ? scene === 'mountainSummit' ? 'Place the five froststones on the altar' : 'Explore the summit altar' : scene === 'mountainSummit' ? 'Read the inscriptions and find five froststones' : 'Find five froststones' : northScene ? northRelicsDelivered ? scene === 'northGrove' && !mountainRelicsDelivered ? 'Speak with Eira about the snowy mountain' : 'The Northstar altar is awake' : northRelics.every(relic => relic.taken) ? scene === 'northShrine' ? 'Place four aurora shards on the altar' : 'Explore the Northstar altar' : scene === 'northShrine' ? 'Read the inscriptions and find four shards' : 'Find four aurora shards' : lakeScene ? lakeItemsDelivered ? 'The Moonstone Isle is awake' : lakeItems.every(item => item.taken) ? scene === 'moonstoneIsle' ? 'Place the four keepsakes on the Moonstone' : 'Enter Moonstone Isle to place the keepsakes' : scene === 'moonstoneIsle' ? 'Find four keepsakes on Willowmere Lake’s islands' : inBoat ? 'Row between the islands for four keepsakes' : 'Find four keepsakes on the islands' : scene === 'stoneCircle' ? meadowDelivered ? 'Seek Willowmere Lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Place the blooms at the heartstone' : 'Explore the old stone circle' : scene === 'meadow' ? meadowDelivered ? 'Follow the stream south to Willowmere Lake' : meadowBlooms.every(bloom => bloom.taken) ? 'Bring the blooms to the stone circle' : 'Gather three meadow blooms' : scene === 'building' ? `Explore ${currentBuilding.name}` : scene === 'shrine' ? shrineAwakened ? 'Explore the awakened shrine' : 'Explore the ancient shrine' : shrineAwakened ? forestFolk.concat(villageFolk).every(person => person.spoken) ? 'Hartshollow remembers' : 'Speak with the forest folk' : player.collected === 3 ? 'Return to the old shrine' : 'Find the three lost lights';
     if (ruinsQuestActive) {
       const relic = ruinsRelics[ruinsProgress];
       seedLabel.textContent = `${ruinsProgress} / ${ruinsRelics.length} ◇`;
@@ -2844,11 +2844,11 @@
         say('You step back through the arch to the Moonstone Isle docks.');
       } else if (target.type === 'moonstoneAltar') {
         if (lakeItemsDelivered) say('The four keepsakes shine together on the Moonstone.');
-        else if (!lakeItems.every(item => item.taken)) say('The Moonstone is waiting. Find all four keepsakes on the lake islands first.');
+        else if (!lakeItems.every(item => item.taken)) say('The Moonstone is waiting. Find all four keepsakes on Willowmere Lake’s islands first.');
         else {
           lakeItemsDelivered = true;
           updateHud();
-          say('You place the four keepsakes on the Moonstone. A silver light ripples across the lake.');
+          say('You place the four keepsakes on the Moonstone. A silver light ripples across Willowmere Lake.');
         }
       }
       return;
@@ -2862,7 +2862,7 @@
         player.faceY = 1;
         meadowCircleReturn = null;
         updateHud();
-        say('You step back into the open meadow.');
+        say('You step back into Sunbell Meadow.');
       } else if (target.type === 'circleInscription') say(target.item.text);
       else if (target.type === 'circleAltar') {
         if (meadowDelivered) say('The heartstone glows softly around the three flowers.');
@@ -2903,7 +2903,7 @@
         say('You step into the old stone circle.');
       } else if (target.type === 'lakeEntrance') {
         if (!meadowBlooms.every(bloom => bloom.taken)) {
-          say('The stream path is quiet. Gather all three meadow blooms before heading to the lake.');
+          say('The stream path is quiet. Gather all three meadow blooms before heading to Willowmere Lake.');
           return;
         }
         lakeReturn = { x: player.x, y: player.y };
@@ -2914,7 +2914,7 @@
         player.faceY = 0;
         player.jumpTime = 0;
         updateHud();
-        say('You follow the stream down to the South Lake.');
+        say('You follow the stream down to Willowmere Lake.');
       }
       return;
     }
@@ -2924,7 +2924,7 @@
         player.x = lakeBoat.x;
         player.y = lakeBoat.y;
         updateHud();
-        say('You climb into the boat. Row across the lake to the east dock.');
+        say('You climb into the boat. Row across Willowmere Lake to the east dock.');
       } else if (target.type === 'lakeDock') {
         inBoat = false;
         player.x = target.item.landX;
@@ -2955,7 +2955,7 @@
         player.faceY = -1;
         lakeReturn = null;
         updateHud();
-        say('You follow the stream back into the meadow.');
+        say('You follow the stream back into Sunbell Meadow.');
       }
       return;
     }
@@ -3020,7 +3020,7 @@
     }
     if (target.type === 'northGate') {
       if (!lakeItemsDelivered) {
-        say('The Northstar path is quiet. Return all four keepsakes to the Moonstone in the lake first.');
+        say('The Northstar path is quiet. Return all four keepsakes to the Moonstone in Willowmere Lake first.');
         return;
       }
       northReturn = { x: player.x, y: player.y };
@@ -3065,7 +3065,7 @@
       player.faceY = 0;
       player.jumpTime = 0;
       updateHud();
-      say('Beyond the village, wildflowers sway in the East Meadow.');
+      say('Beyond the village, wildflowers sway in Sunbell Meadow.');
       return;
     }
     if (player.collected < 3) { say('The heartwood is quiet. Find all three lost lights first.'); return; }
@@ -3119,7 +3119,7 @@
         player.x = 272;
         player.y = 738;
       }
-      say(scene === 'mountainSummit' ? 'The mountain shrine gently returns you to its entrance.' : scene === 'snowyMountain' ? 'The mountain path gently returns you to its entrance.' : scene === 'northShrine' ? 'The Northstar altar gently returns you to its entrance.' : scene === 'northGrove' ? 'The northern glade gently returns you to its entrance.' : scene === 'meadow' || scene === 'stoneCircle' ? 'The meadow gently returns you to its entrance.' : scene === 'moonstoneIsle' ? 'The sanctum gently returns you to its entrance.' : scene === 'lake' ? 'The lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
+      say(scene === 'mountainSummit' ? 'The mountain shrine gently returns you to its entrance.' : scene === 'snowyMountain' ? 'The mountain path gently returns you to its entrance.' : scene === 'northShrine' ? 'The Northstar altar gently returns you to its entrance.' : scene === 'northGrove' ? 'The northern glade gently returns you to its entrance.' : scene === 'meadow' || scene === 'stoneCircle' ? 'The Sunbell Meadow gently returns you to its entrance.' : scene === 'moonstoneIsle' ? 'The sanctum gently returns you to its entrance.' : scene === 'lake' ? 'The Willowmere Lake shore gently returns you to the stream.' : 'The forest gently returns you to the old path.');
     } else say('A wisp brushes past. Keep your distance or strike back.');
     updateHud();
   }
@@ -3241,11 +3241,11 @@
         northExit: 'E  Return to the forest',
         northMountainGuide: `E  Talk to ${northMountainGuide.name}`,
         northMountainEntrance: northRelicsDelivered ? 'E  Enter the snowy mountain' : 'Return all four aurora shards to the Northstar altar to open the mountain pass',
-        meadowGate: player.collected < 3 ? 'Find all three lost lights to open the meadow gate' : 'E  Follow the eastern lane to the meadow',
+        meadowGate: player.collected < 3 ? 'Find all three lost lights to open the Sunbell Meadow gate' : 'E  Follow the eastern lane to Sunbell Meadow',
         meadowExit: 'E  Return to the village',
         meadowPerson: `E  Talk to ${meadowGuide.name}`,
         meadowGatheringPlace: 'E  Explore the stone circle',
-        lakeEntrance: meadowBlooms.every(bloom => bloom.taken) ? 'E  Follow the stream to the South Lake' : 'Gather all three blooms to open the lake path',
+        lakeEntrance: meadowBlooms.every(bloom => bloom.taken) ? 'E  Follow the stream to Willowmere Lake' : 'Gather all three blooms to open the Willowmere Lake path',
         lakeBoat: 'E  Board the boat',
         lakeDock: 'E  Dock at the shore',
         moonstoneEntrance: 'E  Enter Moonstone Isle',
@@ -3253,10 +3253,10 @@
         moonstoneExit: 'E  Return to the Moonstone Isle docks',
         circleAltar: meadowDelivered ? 'The heartstone shines with flowers' : meadowBlooms.every(bloom => bloom.taken) ? 'E  Place the blooms at the heartstone' : 'The heartstone is waiting for three blooms',
         circleInscription: 'E  Read the stone carving',
-        circleExit: 'E  Return to the meadow',
+        circleExit: 'E  Return to Sunbell Meadow',
         lakeGuide: `E  Talk to ${lakeGuide.name}`,
         moonstoneGuide: `E  Talk to ${moonstoneGuide.name}`,
-        lakeExit: 'E  Follow the stream back to the meadow',
+        lakeExit: 'E  Follow the stream back to Sunbell Meadow',
         altar: shrineAwakened ? 'E  Listen to the heartwood' : 'E  Set the lights into the altar',
         inscription: 'E  Read the inscription',
         exit: 'E  Return to the forest'
